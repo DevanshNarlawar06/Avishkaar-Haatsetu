@@ -7,11 +7,11 @@ from app.api.deps import SessionDep
 from app.models.artisan import ArtisanProfile, Role, User
 from app.models.passport import CraftPassport, PassportScan
 from app.models.product import Product, ProductStatus
+from app.core.config import settings
 from app.services.storage import supabase
 
 router = APIRouter(prefix="/ministry", tags=["ministry"])
 
-SUPABASE_STORAGE_BASE = "https://dzngjheuwmcgtbumxbux.supabase.co/storage/v1/object/public"
 SAMPLE_AADHAAR_DOC = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Aadhaar_letter_large.png/640px-Aadhaar_letter_large.png"
 
 
@@ -47,7 +47,9 @@ def format_document_url(raw_url: str | None) -> str:
 
     # Signing failed, or the object predates the private bucket. Fall back to
     # the public layout rather than showing nothing at all.
-    return f"{SUPABASE_STORAGE_BASE}/{clean_path}"
+    if not settings.SUPABASE_URL:
+        return SAMPLE_AADHAAR_DOC
+    return f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{clean_path}"
 
 
 @router.get("/overview")

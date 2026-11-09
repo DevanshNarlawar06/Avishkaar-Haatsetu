@@ -30,6 +30,10 @@ services:
         sync: false
       - key: FIREBASE_PROJECT_ID
         sync: false
+      - key: PASSPORT_PRIVATE_KEY_HEX
+        sync: false
+      - key: PASSPORT_PUBLIC_KEY_HEX
+        sync: false
 
       - key: GEMINI_MODEL
         value: gemini-3.8-flash

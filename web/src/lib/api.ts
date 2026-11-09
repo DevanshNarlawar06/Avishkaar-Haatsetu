@@ -1,6 +1,6 @@
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://bharatse-api.onrender.com/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "https://haatsetu-api.onrender.com/api/v1";
 
 export interface PendingArtisan {
   id: string;
