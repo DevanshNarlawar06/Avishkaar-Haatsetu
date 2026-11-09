@@ -29,7 +29,7 @@ from app.models.artisan import User
 from app.models.product import Product, ProductImage, ProductStatus
 from app.schemas.images import EnhanceResponse, ListingImage, ListingImagesResponse
 from app.services.images.background import remove_background
-from app.services.images.enhance import auto_correct, compose_on_canvas
+from app.services.images.enhance import auto_correct, compose_on_canvas, light_studio
 from app.services.images.generate import enhance as generate_enhanced
 from app.services.storage import supabase
 
@@ -119,6 +119,18 @@ async def _generate_or_cut(
         return url, "cutout"
     except ProviderUnavailableError as exc:
         log.warning("cutout_enhance_failed", error=exc.message)
+
+    try:
+        light = await run_in_threadpool(light_studio, payload)
+        url = await run_in_threadpool(
+            supabase.upload,
+            light,
+            supabase.product_image_path(folder, "enhanced", "jpg"),
+            "image/jpeg",
+        )
+        return url, "auto"
+    except ProviderUnavailableError as exc:
+        log.warning("light_enhance_failed", error=exc.message)
 
     return None, "none"
 

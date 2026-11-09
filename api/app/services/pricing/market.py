@@ -163,8 +163,10 @@ def ask_market(
     client = genai.Client(api_key=settings.listing_api_key)
 
     try:
-        response = client.models.generate_content(
-            model=settings.GEMINI_MODEL,
+        from app.services.ai import gemini_call
+
+        response = gemini_call.generate(
+            client,
             contents=PROMPT.format(
                 description=description or "not described",
                 material=material or "unknown",

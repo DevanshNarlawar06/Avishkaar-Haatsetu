@@ -38,7 +38,9 @@ class Settings(BaseSettings):
 
     LISTING_PROVIDER: Literal["gemini", "bhashini", "sarvam"] = "gemini"
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-3.8-flash"
+    GEMINI_MODEL: str = "gemini-3.5-flash"
+    # Tried in order when GEMINI_MODEL is busy (503/429). See services/ai/gemini_call.py.
+    GEMINI_FALLBACK_MODELS: str = "gemini-2.5-flash,gemini-3.5-flash-lite,gemini-3.8-flash"
 
     # Separate key for the voice to listing call, so it can sit on a project
     # with no billing and stay on the free tier.

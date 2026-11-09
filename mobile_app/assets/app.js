@@ -541,7 +541,7 @@
       id = [...new Uint8Array(h)].slice(0, 4).map((x) => x.toString(16).padStart(2, "0")).join("").toUpperCase();
     } catch (e) { /* no WebCrypto: keep the client id */ }
     const b64 = btoa(unescape(encodeURIComponent(json))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-    return { qr: "https://haatsetu.in/p/" + b64, signed: false, id: "HS-" + a.state + "-" + id };
+    return { qr: "HAATSETU-PASSPORT-DEMO:" + b64, signed: false, id: "HS-" + a.state + "-" + id };
   }
 
   async function thumbOf(src) {
@@ -619,7 +619,7 @@
         </div>
         <button class="btn ghost" id="reset">${t("reset")}</button>
         <button class="btn ghost" id="signout" style="color:var(--chili)">${t("signOut")}</button>
-        <p class="small muted" style="text-align:center">HaatSetu 1.0 · AVISHKAAR Season 4</p>
+        <p class="small muted" style="text-align:center">HaatSetu 1.1 · AVISHKAAR Season 4</p>
       </div>`;
     const msg = (cls, m) => { $("#srv-msg").innerHTML = m ? `<div class="note ${cls} small">${esc(m)}</div>` : ""; };
     $("#srv-save").onclick = () => {

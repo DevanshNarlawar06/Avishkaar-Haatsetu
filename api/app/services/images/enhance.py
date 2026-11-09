@@ -98,3 +98,38 @@ def compose_on_canvas(
     buffer = io.BytesIO()
     canvas.convert("RGB").save(buffer, format="JPEG", quality=92)
     return buffer.getvalue()
+
+
+def light_studio(image_bytes: bytes, size: int = 1200) -> bytes:
+    """Pillow only: the last fallback, for a server without opencv or rembg.
+
+    Upright, auto levels, a little colour and sharpness, square on a warm white
+    margin. No background removal, but a phone photo still comes back brighter
+    and better framed, so the artisan never sees "enhancement failed".
+    """
+    try:
+        from PIL import Image, ImageEnhance, ImageOps
+    except ImportError as exc:
+        raise ProviderUnavailableError("Pillow is not installed") from exc
+
+    try:
+        img = ImageOps.exif_transpose(Image.open(io.BytesIO(image_bytes))).convert("RGB")
+    except Exception as exc:  # unreadable upload
+        raise ProviderUnavailableError(f"Could not read the photo: {exc}") from exc
+
+    img = ImageOps.autocontrast(img, cutoff=1)
+    img = ImageEnhance.Color(img).enhance(1.15)
+    img = ImageEnhance.Sharpness(img).enhance(1.25)
+
+    side = min(img.size)
+    left, top = (img.width - side) // 2, (img.height - side) // 2
+    img = img.crop((left, top, left + side, top + side))
+    inner = round(size * (1 - 2 * MARGIN / 2))
+    img = img.resize((inner, inner), Image.LANCZOS)
+
+    canvas = Image.new("RGB", (size, size), (250, 247, 240))
+    off = (size - inner) // 2
+    canvas.paste(img, (off, off))
+    out = io.BytesIO()
+    canvas.save(out, "JPEG", quality=90)
+    return out.getvalue()

@@ -10,6 +10,7 @@ from __future__ import annotations
 from app.core.config import settings
 from app.core.errors import ProviderUnavailableError
 from app.core.logging import get_logger
+from app.services.ai import gemini_call
 from app.services.ai.provider import ListingProvider
 from app.services.ai.schema import GeneratedListing
 
@@ -67,8 +68,8 @@ class GeminiProvider(ListingProvider):
             prompt += f"\nShe is most likely speaking {language_hint}."
 
         try:
-            response = client.models.generate_content(
-                model=settings.GEMINI_MODEL,
+            response = gemini_call.generate(
+                client,
                 contents=[
                     types.Part.from_bytes(data=audio, mime_type=mime_type),
                     prompt,

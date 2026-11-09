@@ -31,8 +31,10 @@ def listing_from_text(transcript: str, language: str = "hi") -> GeneratedListing
         raise ProviderUnavailableError("google-genai is not installed") from exc
 
     client = genai.Client(api_key=settings.listing_api_key)
-    response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
+    from app.services.ai import gemini_call
+
+    response = gemini_call.generate(
+        client,
         contents=PROMPT.format(transcript=transcript),
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
