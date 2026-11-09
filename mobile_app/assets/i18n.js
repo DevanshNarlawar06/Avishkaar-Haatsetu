@@ -85,6 +85,7 @@ window.I18N = {
     perHour: "/hour",
     days: "days",
     sold: "sold",
+    modelShot: "Model shot",
   },
   hi: {
     tagline: "गाँव के हाट से हर बाज़ार तक",
@@ -171,5 +172,6 @@ window.I18N = {
     perHour: "/घंटा",
     days: "दिन",
     sold: "बिके",
+    modelShot: "मॉडल फ़ोटो",
   },
 };

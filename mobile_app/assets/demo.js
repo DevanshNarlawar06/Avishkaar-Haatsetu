@@ -73,6 +73,53 @@ window.DEMO = (function () {
     },
   ];
 
+  // Showcase product: when a photo of it is recognised, the app shows these prepared studio
+  // and model shots (the live image model needs a billed Gemini key).
+  const showcase = {
+    bag: {
+      studio: "showcase/bag-studio.webp",
+      model: "showcase/bag-model.webp",
+      listing: {
+        kind: "bag",
+        transcript: "यह ऑलिव हरे रंग का छोटा बैकपैक है, दानेदार लेदर फ़िनिश, ऊपर फ़्लैप और सुनहरा लोगो। पीछे दो एडजस्ट होने वाली स्ट्रैप और ऊपर हैंडल है। सिलाई और फ़िनिशिंग में करीब छह घंटे लगे।",
+        detected_language: "hi",
+        title_en: "Olive Pebble-Grain Mini Backpack with Flap",
+        title_hi: "फ़्लैप वाला ऑलिव पेबल-ग्रेन मिनी बैकपैक",
+        description_en: "A compact olive-green backpack in pebble-grain vegan leather, with a fold-over flap, gold-tone logo plate and a slim tab closure. Two adjustable shoulder straps and a top handle make it easy to carry every day. Stitched and finished by hand over about six hours.",
+        description_hi: "दानेदार वीगन लेदर में ऑलिव हरे रंग का छोटा बैकपैक, मुड़ने वाले फ़्लैप, सुनहरे लोगो और पतली टैब के साथ। दो एडजस्ट होने वाली स्ट्रैप और ऊपर का हैंडल इसे रोज़ ले जाने में आसान बनाते हैं। करीब छह घंटे में हाथ से सिला और तैयार किया गया।",
+        tags: ["mini backpack", "olive green", "vegan leather", "women's bag", "everyday bag"],
+        materials: ["vegan leather", "metal fittings"],
+        technique: "Hand-stitched leatherwork",
+        category: "leather",
+        estimated_hours: 6,
+        material_cost: 650,
+      },
+    },
+  };
+
+  /** Share of olive-green pixels in the centre of a photo (0..1). */
+  async function olive(src) {
+    const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = bad; i.src = src; });
+    const c = document.createElement("canvas"); c.width = c.height = 64;
+    const ctx = c.getContext("2d"); ctx.drawImage(img, 0, 0, 64, 64);
+    const d = ctx.getImageData(16, 16, 32, 32).data;
+    let hit = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), v = mx, s = mx ? (mx - mn) / mx : 0;
+      let h = 0;
+      if (mx !== mn) h = mx === r ? ((g - b) / (mx - mn)) % 6 : mx === g ? (b - r) / (mx - mn) + 2 : (r - g) / (mx - mn) + 4;
+      h = (h * 60 + 360) % 360;
+      if (h >= 40 && h <= 105 && s >= 0.12 && v >= 0.15 && v <= 0.85) hit++;
+    }
+    return hit / (d.length / 4);
+  }
+
+  /** The showcase entry a photo matches, or null. */
+  async function matchShowcase(src) {
+    try { return (await olive(src)) >= 0.4 ? showcase.bag : null; } catch (e) { return null; }
+  }
+
   // ---- sample "phone photos": a product on a cluttered table in dim light ----
   function table(ctx, w, h) {
     const wall = ctx.createLinearGradient(0, 0, 0, h * .45);
@@ -240,5 +287,5 @@ window.DEMO = (function () {
     return { p10, p50, p90, floor: f.floor, breakdown: f, lifted_to_floor: lifted, model_used: false };
   }
 
-  return { artisan, listings, samplePhoto, cleanPhoto, seedProducts, floorOf, priceOf, WAGE };
+  return { artisan, listings, showcase, matchShowcase, samplePhoto, cleanPhoto, seedProducts, floorOf, priceOf, WAGE };
 })();

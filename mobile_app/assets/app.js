@@ -275,7 +275,7 @@
     RENDER.speak();
   }
 
-  const kindOf = (cat) => ({ painting: "painting", pottery: "pottery", bamboo_cane: "basket", food_products: "jar", forest_produce: "jar", agri_produce: "jar" }[cat] || "painting");
+  const kindOf = (cat) => ({ leather: "bag", painting: "painting", pottery: "pottery", bamboo_cane: "basket", food_products: "jar", forest_produce: "jar", agri_produce: "jar" }[cat] || "painting");
 
   function renderHeard() {
     const l = draft.listing;
@@ -325,7 +325,25 @@
     $("#photo-body").innerHTML = `<div class="busy"><div class="spinner"></div><p>${t("studioWorking")}</p></div>`;
     draft.photo = await Studio.shrink(src);
     draft.before = await Studio.before(draft.photo);
+    draft.lifestyle = null;
     let out = null;
+    const show = await DEMO.matchShowcase(draft.photo);
+    if (show) {
+      await new Promise((ok) => setTimeout(ok, 2200));
+      // A sample voice note does not describe this product: use the product's own listing.
+      if (!draft.recorded) {
+        draft.listing = Object.assign({}, show.listing);
+        draft.kind = show.listing.kind;
+        draft.hours = show.listing.estimated_hours;
+        draft.material_cost = show.listing.material_cost;
+      }
+      if (live()) { try { await ensureProduct(); } catch (e) { /* listing still works offline */ } }
+      draft.studio = show.studio;
+      draft.lifestyle = show.model;
+      draft.studioMethod = "generative";
+      RENDER.photo();
+      return;
+    }
     if (live()) {
       try {
         await ensureProduct();
@@ -354,13 +372,15 @@
         <input type="range" min="0" max="100" value="50" id="cmp-range" aria-label="${t("dragCompare")}">
       </div>
       <div class="row between small muted"><span>${t("dragCompare")}</span><span>${esc({ generative: "AI studio", cutout: "Background removed", auto: "Auto-enhance", "on-device": "On-device enhance" }[draft.studioMethod] || draft.studioMethod)}</span></div>
+      ${draft.lifestyle ? `<div class="card stack"><div class="row between"><h3>${t("modelShot")}</h3><span class="chip on">AI</span></div>
+        <img src="${esc(draft.lifestyle)}" alt="" style="border-radius:12px;width:100%"></div>` : ""}
       <button class="btn ghost" id="retake">${ICON.cam} ${t("retake")}</button>`;
     $("#cmp-range").oninput = (e) => {
       const v = e.target.value;
       $("#after").style.clipPath = `inset(0 0 0 ${v}%)`;
       $("#handle").style.left = v + "%";
     };
-    $("#retake").onclick = () => { draft.studio = null; draft.photo = null; RENDER.photo(); };
+    $("#retake").onclick = () => { draft.studio = null; draft.photo = null; draft.lifestyle = null; RENDER.photo(); };
   }
 
   // Live mode: the product row exists before its photo, so the enhanced image is attached to it.
@@ -524,7 +544,7 @@
     S.products.push({
       id: draft.productId || draft.client_id, live: live() && !!draft.productId, created: Date.now(), kind: draft.kind,
       listing: l, hours: draft.hours, material_cost: draft.material_cost, price: draft.price, floor: draft.pricing.floor,
-      channels: draft.channels, status: "published", sold: 0, thumb, passport: draft.passport,
+      channels: draft.channels, status: "published", sold: 0, thumb, passport: draft.passport, lifestyle: draft.lifestyle || null,
     });
     save();
     draft.justPublished = true;
@@ -558,7 +578,7 @@
   function productToDraft(p) {
     return {
       listing: p.listing, kind: p.kind, hours: p.hours, price: p.price, pricing: { floor: p.floor }, channels: p.channels,
-      studio: p.thumb || DEMO.cleanPhoto(p.kind), passport: p.passport || null, client_id: p.id, live: p.live,
+      studio: p.thumb || DEMO.cleanPhoto(p.kind), passport: p.passport || null, client_id: p.id, live: p.live, lifestyle: p.lifestyle || null,
     };
   }
 
@@ -591,6 +611,7 @@
         <div class="card product"><img src="${esc(d.studio)}" alt=""><div class="grow"><h3>${esc(S.lang === "hi" ? l.title_hi : l.title_en)}</h3>
           <div class="price" style="margin-top:4px">${rupee(d.price)}</div>
           <div class="chips" style="margin-top:6px">${(d.channels || []).map((c) => `<span class="chip on">${chName(c)}</span>`).join("")}</div></div></div>
+        ${d.lifestyle ? `<img src="${esc(d.lifestyle)}" alt="" style="border-radius:16px;width:100%">` : ""}
         <button class="btn primary" id="share">${ICON.share} ${t("share")}</button>
         <button class="btn ghost" id="go-home">${t("home")}</button>
       </div>`;
@@ -620,7 +641,7 @@
         </div>
         <button class="btn ghost" id="reset">${t("reset")}</button>
         <button class="btn ghost" id="signout" style="color:var(--chili)">${t("signOut")}</button>
-        <p class="small muted" style="text-align:center">HaatSetu 1.2 · AVISHKAAR Season 4</p>
+        <p class="small muted" style="text-align:center">HaatSetu 1.3 · AVISHKAAR Season 4</p>
       </div>`;
     const msg = (cls, m) => { $("#srv-msg").innerHTML = m ? `<div class="note ${cls} small">${esc(m)}</div>` : ""; };
     $("#srv-save").onclick = () => {
