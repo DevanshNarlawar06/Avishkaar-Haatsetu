@@ -28,6 +28,19 @@ def is_configured() -> bool:
     return bool(settings.SUPABASE_URL and settings.SUPABASE_SERVICE_KEY)
 
 
+
+def _auth_headers() -> dict[str, str]:
+    """Both kinds of Supabase server key work.
+
+    New secret keys (sb_secret_...) are not JWTs and are read from the `apikey`
+    header only. Legacy service_role keys are JWTs and also go in Authorization.
+    """
+    key = settings.SUPABASE_SERVICE_KEY
+    headers = {"apikey": key}
+    if key.startswith("eyJ"):
+        headers["authorization"] = f"Bearer {key}"
+    return headers
+
 def public_url(path: str, bucket: str | None = None) -> str:
     bucket = bucket or settings.SUPABASE_BUCKET
     return f"{settings.SUPABASE_URL}/storage/v1/object/public/{bucket}/{path}"
@@ -54,7 +67,7 @@ def upload(
             f"{settings.SUPABASE_URL}/storage/v1/object/{bucket}/{path}",
             content=data,
             headers={
-                "authorization": f"Bearer {settings.SUPABASE_SERVICE_KEY}",
+                **_auth_headers(),
                 "content-type": content_type,
                 # Without this a retry of the same upload fails with a duplicate
                 # rather than replacing, which turns a flaky network into a
@@ -117,8 +130,7 @@ def signed_url(path: str, bucket: str | None = None, expires_in: int = 3600) -> 
             f"{settings.SUPABASE_URL}/storage/v1/object/sign/{bucket}/{path}",
             json={"expiresIn": expires_in},
             headers={
-                "authorization": f"Bearer {settings.SUPABASE_SERVICE_KEY}",
-                "apikey": settings.SUPABASE_SERVICE_KEY,
+                **_auth_headers(),
                 "content-type": "application/json",
             },
             timeout=20,
@@ -158,8 +170,7 @@ def remove(paths: list[str], bucket: str | None = None) -> bool:
             f"{settings.SUPABASE_URL}/storage/v1/object/{bucket}",
             json={"prefixes": [p.lstrip("/") for p in paths]},
             headers={
-                "authorization": f"Bearer {settings.SUPABASE_SERVICE_KEY}",
-                "apikey": settings.SUPABASE_SERVICE_KEY,
+                **_auth_headers(),
                 "content-type": "application/json",
             },
             timeout=20,

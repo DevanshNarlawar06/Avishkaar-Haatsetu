@@ -11,10 +11,10 @@ Keys never go into the code or the APK. They go in `api/.env` (local, gitignored
    ```
    DATABASE_URL=postgresql+psycopg://postgres.<ref>:<password>@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
    ```
-3. **Project Settings → API**: copy the Project URL and the `service_role` key:
+3. **Settings → Data API** has the Project URL. **Settings → API Keys → Secret keys** has the server key (`sb_secret_…`; a legacy `service_role` key also works):
    ```
    SUPABASE_URL=https://<ref>.supabase.co
-   SUPABASE_SERVICE_KEY=<service_role key>
+   SUPABASE_SERVICE_KEY=<sb_secret_... key>
    ```
    The service role key bypasses all security rules. It belongs only on the server, never in the app or the web console.
 4. **Storage → New bucket**, create two buckets:
