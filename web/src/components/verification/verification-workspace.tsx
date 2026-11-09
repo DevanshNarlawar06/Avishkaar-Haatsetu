@@ -92,9 +92,9 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
 
     const success = await approveArtisan(artisanId);
     if (success) {
-      setSuccessMessage("Artisan Level 1 Identity Verification Approved successfully!");
+      setSuccessMessage("Producer Level 1 Identity Verification Approved successfully!");
       setTimeout(() => {
-        router.push("/artisan-verification");
+        router.push("/producer-verification");
       }, 1500);
     } else {
       setValidationError("Failed to update verification status in database. Please try again.");
@@ -108,7 +108,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
     setSuccessMessage(`Status updated to 'Action Required': ${rejectReason}`);
     setShowRejectModal(false);
     setTimeout(() => {
-      router.push("/artisan-verification");
+      router.push("/producer-verification");
     }, 1500);
     setIsSubmitting(false);
   };
@@ -116,7 +116,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
   if (loading || !artisan) {
     return (
       <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
-        Loading artisan verification workspace...
+        Loading producer verification workspace...
       </div>
     );
   }
@@ -127,7 +127,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b pb-4">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-            <Link href="/artisan-verification">
+            <Link href="/producer-verification">
               <ArrowLeft className="size-4" />
             </Link>
           </Button>
@@ -139,7 +139,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              Artisan ID: <span className="font-mono">{artisan.id}</span> &bull; Submitted: {artisan.submitted_date}
+              Producer ID: <span className="font-mono">{artisan.id}</span> &bull; Submitted: {artisan.submitted_date}
             </p>
           </div>
         </div>
@@ -167,12 +167,12 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
 
       {/* 3-Column Workspace Grid */}
       <div className="grid gap-5 lg:grid-cols-12">
-        {/* LEFT COLUMN: Artisan Profile (3 Cols) */}
+        {/* LEFT COLUMN: Producer Profile (3 Cols) */}
         <Card className="lg:col-span-3 h-fit">
           <CardHeader className="pb-3 border-b">
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <User className="size-4 text-[var(--primary)]" />
-              Artisan Profile
+              Producer Profile
             </CardTitle>
             <CardDescription className="text-xs">Submitted onboard data</CardDescription>
           </CardHeader>
@@ -199,14 +199,14 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
                 <span>{artisan.district || "N/A"}</span>
               </div>
               <div>
-                <span className="text-muted-foreground block text-[11px] uppercase tracking-wider">Craft</span>
+                <span className="text-muted-foreground block text-[11px] uppercase tracking-wider">Trade</span>
                 <span className="font-medium text-[var(--ring)]">{artisan.craft}</span>
               </div>
             </div>
 
             {artisan.cluster && (
               <div>
-                <span className="text-muted-foreground block text-[11px] uppercase tracking-wider">Craft Cluster</span>
+                <span className="text-muted-foreground block text-[11px] uppercase tracking-wider">Producer Cluster</span>
                 <span className="flex items-center gap-1">
                   <MapPin className="size-3 text-muted-foreground" />
                   {artisan.cluster}
@@ -421,7 +421,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-muted-foreground text-xs uppercase tracking-wider flex items-center gap-1.5">
                     <Badge variant="outline" className="h-5 px-1.5 text-[10px]">L2</Badge>
-                    Artisan Credential
+                    Producer Credential
                   </span>
                   <Badge variant="secondary" className="text-[10px]">
                     Upcoming
@@ -429,7 +429,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
                 </div>
                 <div className="text-xs space-y-1 pt-1">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Pehchan ID:</span>
+                    <span className="text-muted-foreground">Producer ID (Pehchan / NRLM):</span>
                     <span className="font-mono font-medium">{artisan.pehchan_id || "PHN-BR-284731"}</span>
                   </div>
                   <div className="flex justify-between">
@@ -444,7 +444,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-muted-foreground text-xs uppercase tracking-wider flex items-center gap-1.5">
                     <Badge variant="outline" className="h-5 px-1.5 text-[10px]">L3</Badge>
-                    Workspace / Craft
+                    Workspace / Trade
                   </span>
                   <Badge variant="secondary" className="text-[10px]">
                     Optional
@@ -479,7 +479,7 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
               disabled={isSubmitting}
             >
               <CheckCircle2 className="size-4" />
-              Approve Artisan (Level 1)
+              Approve Producer (Level 1)
             </Button>
 
             <Button
@@ -507,14 +507,14 @@ export function VerificationWorkspace({ artisanId }: VerificationWorkspaceProps)
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Select the reason for marking this artisan&apos;s verification as requiring further action:
+              Select the reason for marking this producer&apos;s verification as requiring further action:
             </p>
 
             <div className="space-y-2 text-xs">
               {[
                 "Identity details don't match submitted profile",
                 "Aadhaar document image unclear or unreadable",
-                "Additional artisan proof required",
+                "Additional producer proof required",
                 "Workspace evidence required (photos/video)",
                 "Other discrepancy in application",
               ].map((reason) => (

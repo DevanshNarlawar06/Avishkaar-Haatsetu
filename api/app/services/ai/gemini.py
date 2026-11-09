@@ -16,26 +16,30 @@ from app.services.ai.schema import GeneratedListing
 
 log = get_logger(__name__)
 
-PROMPT = """You are helping an Indian artisan list a handmade product for sale.
+PROMPT = """You are helping an Indian rural producer list their own product for sale.
 
-The audio is the maker describing her own product, in her own language. It may
-be Hindi, Marathi, Bengali, Tamil, Telugu, Gujarati, Kannada, Odia or Punjabi.
+The producer may be an artisan, a handloom weaver, a self-help group member
+making food products, a farmer, a forest-produce collector or a small village
+workshop. The audio is the producer describing their own product, in their own
+language. It may be Hindi, Marathi, Bengali, Tamil, Telugu, Gujarati, Kannada, Odia or Punjabi.
 
-Write a listing from what she says. Rules:
-1. Only use facts she states. Never invent a material, a size or a place.
+Write a listing from what they say. Rules:
+1. Only use facts they state. Never invent a material, a size or a place.
 2. Write both English and Hindi. Neither is a translation of the other, both
-   describe the same object naturally in that language.
+   describe the same product naturally in that language.
 3. The description should read like a person wrote it, not like an
    advertisement. Two or three sentences.
 4. Tags should be words a buyer would actually search for.
-5. If she mentions how long it took, put that in estimated_hours.
-6. Put what you heard, in her own language, in transcript.
+5. If they mention how long it took, put that in estimated_hours.
+6. Put what you heard, in their own language, in transcript.
+7. Pick the closest category. Food, farm, forest and personal care products
+   have their own categories; use "other" only when nothing fits.
 
 If the audio is silent, too short, or you cannot make out an actual description
-of an object, return empty strings for the titles and descriptions and put what
+of a product, return empty strings for the titles and descriptions and put what
 you did hear, or nothing, in transcript. Do not fill the gap with a plausible
-handicraft. An empty result is correct and useful; an invented product is
-neither, and it will be published under a real artisan's name.
+product. An empty result is correct and useful; an invented product is
+neither, and it will be published under a real producer's name.
 """
 
 

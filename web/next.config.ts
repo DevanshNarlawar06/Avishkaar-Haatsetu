@@ -6,6 +6,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // The console now serves every rural producer, not only artisans.
+  async redirects() {
+    return [
+      { source: "/artisan-verification", destination: "/producer-verification", permanent: true },
+      { source: "/artisan-verification/:id", destination: "/producer-verification/:id", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

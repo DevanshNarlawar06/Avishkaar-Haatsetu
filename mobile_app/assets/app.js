@@ -73,12 +73,13 @@
     $("#welcome").innerHTML = `
       <div>
         <div class="row between">
-          <span class="badge hero-badge">AVISHKAAR · Rural Empowerment</span>
+          <span class="badge hero-badge">AVISHKAAR · Theme 1</span>
           <div class="lang-switch"><button data-lang="hi" class="${S.lang === "hi" ? "on" : ""}">हिंदी</button><button data-lang="en" class="${S.lang === "en" ? "on" : ""}">English</button></div>
         </div>
         <img class="welcome-mark" src="logo.svg" alt="">
         <h1 class="welcome-title">Haat<span>Setu</span></h1>
         <p class="welcome-tag">${S.lang === "hi" ? "गाँव के हाट से हर बाज़ार तक" : "From the village haat to every market"}</p>
+        <p class="small" style="color:rgba(255,255,255,.7);margin:6px 0 0">${t("forWho")}</p>
         <ul class="welcome-points">
           <li><i>${ICON.mic}</i>${t("p1")}</li>
           <li><i>${ICON.cam}</i>${t("p2")}</li>
@@ -274,7 +275,7 @@
     RENDER.speak();
   }
 
-  const kindOf = (cat) => ({ painting: "painting", pottery: "pottery", bamboo_cane: "basket" }[cat] || "painting");
+  const kindOf = (cat) => ({ painting: "painting", pottery: "pottery", bamboo_cane: "basket", food_products: "jar", forest_produce: "jar", agri_produce: "jar" }[cat] || "painting");
 
   function renderHeard() {
     const l = draft.listing;
@@ -328,7 +329,7 @@
     if (live()) {
       try {
         await ensureProduct();
-        const r = await Api.enhance(draft.photo, draft.listing.title_en, draft.productId);
+        const r = await Api.enhance(draft.before, draft.listing.title_en, draft.productId);
         out = r.enhanced_url || r.original_url;
         draft.studioMethod = r.method;
       } catch (e) {
@@ -352,7 +353,7 @@
         <span class="tag l">${t("before")}</span><span class="tag r">${t("after")}</span>
         <input type="range" min="0" max="100" value="50" id="cmp-range" aria-label="${t("dragCompare")}">
       </div>
-      <div class="row between small muted"><span>${t("dragCompare")}</span><span>${esc(draft.studioMethod)}</span></div>
+      <div class="row between small muted"><span>${t("dragCompare")}</span><span>${esc({ generative: "AI studio", cutout: "Background removed", auto: "Auto-enhance", "on-device": "On-device enhance" }[draft.studioMethod] || draft.studioMethod)}</span></div>
       <button class="btn ghost" id="retake">${ICON.cam} ${t("retake")}</button>`;
     $("#cmp-range").oninput = (e) => {
       const v = e.target.value;
@@ -619,7 +620,7 @@
         </div>
         <button class="btn ghost" id="reset">${t("reset")}</button>
         <button class="btn ghost" id="signout" style="color:var(--chili)">${t("signOut")}</button>
-        <p class="small muted" style="text-align:center">HaatSetu 1.1 · AVISHKAAR Season 4</p>
+        <p class="small muted" style="text-align:center">HaatSetu 1.2 · AVISHKAAR Season 4</p>
       </div>`;
     const msg = (cls, m) => { $("#srv-msg").innerHTML = m ? `<div class="note ${cls} small">${esc(m)}</div>` : ""; };
     $("#srv-save").onclick = () => {

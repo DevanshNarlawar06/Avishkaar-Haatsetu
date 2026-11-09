@@ -63,6 +63,8 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         s.setTextZoom(100);
+        // The app has its own light palette; stop Android dark mode from repainting it.
+        if (Build.VERSION.SDK_INT >= 33) s.setAlgorithmicDarkeningAllowed(false);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         web.setWebViewClient(new Client());
         web.setWebChromeClient(new Chrome());

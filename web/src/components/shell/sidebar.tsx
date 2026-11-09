@@ -19,11 +19,11 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/", label: "Overview", icon: LayoutDashboard, ready: true },
-  { href: "/artisan-verification", label: "Artisan Verification", icon: ShieldCheck, ready: true },
+  { href: "/producer-verification", label: "Producer Verification", icon: ShieldCheck, ready: true },
   { href: "/beneficiaries", label: "Beneficiaries", icon: Users, ready: true },
   { href: "/clusters", label: "Clusters", icon: MapPinned, ready: true },
   { href: "/catalogue", label: "Catalogue", icon: Boxes, ready: true },
-  { href: "/passports", label: "Craft Passports", icon: FileBadge2, ready: true },
+  { href: "/passports", label: "Origin Passports", icon: FileBadge2, ready: true },
   { href: "/reports", label: "Reports", icon: BarChart3, ready: true },
 ];
 
@@ -77,9 +77,10 @@ export function Sidebar() {
         <ul className="mt-2 space-y-1.5 text-[11px] text-sidebar-foreground/70">
           {[
             ["Handicraft artisans", "Live"],
+            ["Handloom weavers", "Pilot"],
             ["SHG food products", "Pilot"],
-            ["Handloom weavers", "Next"],
             ["Forest produce", "Next"],
+            ["Rural micro-manufacturing", "Next"],
           ].map(([label, stage]) => (
             <li key={label} className="flex items-center justify-between gap-2">
               <span>{label}</span>

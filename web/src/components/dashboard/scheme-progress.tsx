@@ -17,7 +17,7 @@ export function SchemeProgress() {
           Beneficiaries by scheme
         </CardTitle>
         <CardDescription className="text-xs">
-          Onboarded artisans against the target for each category
+          Onboarded producers against the target for each category
         </CardDescription>
       </CardHeader>
 

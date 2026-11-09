@@ -10,7 +10,8 @@ from app.core.config import settings
 from app.core.errors import ProviderUnavailableError
 from app.services.ai.schema import GeneratedListing
 
-PROMPT = """An Indian artisan described her handmade product. This is what she said:
+PROMPT = """An Indian rural producer (artisan, weaver, SHG member, farmer, forest-produce
+collector or village workshop) described their product. This is what she said:
 
 "{transcript}"
 

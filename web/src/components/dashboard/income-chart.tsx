@@ -34,7 +34,7 @@ export function IncomeChart() {
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="text-sm font-semibold">
-          Median monthly artisan income
+          Median monthly producer income
         </CardTitle>
         <CardDescription className="text-xs">
           Compared against income recorded at intake

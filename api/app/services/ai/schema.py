@@ -18,6 +18,12 @@ Category = Literal[
     "painting",
     "bamboo_cane",
     "leather",
+    # Beyond crafts: the other producer verticals the platform serves.
+    "food_products",     # SHG pickles, spices, papad, millet snacks
+    "agri_produce",      # farm produce sold direct: pulses, jaggery, organic rice
+    "forest_produce",    # honey, mahua, lac, tamarind, sal leaf plates
+    "personal_care",     # handmade soap, herbal oils, incense
+    "home_goods",        # brooms, mats, small rural-workshop products
     "other",
 ]
 

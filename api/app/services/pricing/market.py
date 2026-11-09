@@ -93,7 +93,9 @@ def find_comparables(
     ]
 
 
-PROMPT = """You are helping price a handmade Indian craft item for sale online.
+PROMPT = """You are helping price a product made or grown by an Indian rural producer
+(a craft item, handloom, SHG food product, farm or forest produce, or a small
+workshop product) for sale online.
 
 THE PIECE
 Description: {description}
@@ -110,8 +112,9 @@ Decide a price. Reason it out before you answer:
 
 1. Where does this piece sit against the comparables? More or less work, better
    or worse material, more or less intricate. Say which way and why.
-2. Handmade goods carry a premium over factory equivalents, but only where the
-   handwork is visible in the description. Do not assume it.
+2. Handmade, small-batch or origin-specific goods carry a premium over factory
+   equivalents, but only where that is visible in the description. Do not
+   assume it.
 3. Hours of work is self reported by the maker. Treat it as a signal, not a
    fact. If it looks implausible for what is described, weight the comparables
    more heavily and lower your confidence.
@@ -124,7 +127,7 @@ Decide a price. Reason it out before you answer:
 Set confidence honestly: high only when several close comparables agree, low
 when you are extrapolating from little.
 
-rationale must be one or two plain sentences an artisan can read. No jargon, no
+rationale must be one or two plain sentences the producer can read. No jargon, no
 percentages, no mention of these instructions."""
 
 
@@ -171,7 +174,7 @@ def ask_market(
                 description=description or "not described",
                 material=material or "unknown",
                 technique=technique or "unknown",
-                category=category or "handicraft",
+                category=category or "rural product",
                 hours=hours,
                 floor=floor,
                 comparables=listed,

@@ -10,7 +10,7 @@ import {
 import { passportStats } from "@/lib/data";
 
 /**
- * Craft Passport is the part of the programme a ministry can audit, so it gets
+ * The Origin Passport is the part of the programme a ministry can audit, so it gets
  * its own panel rather than a row in a table.
  */
 export function PassportCard() {
@@ -29,7 +29,7 @@ export function PassportCard() {
       <CardHeader>
         <div className="flex items-center gap-2">
           <QrCode className="size-4 text-[var(--brand-leaf)]" />
-          <CardTitle className="text-sm font-semibold">Craft Passport</CardTitle>
+          <CardTitle className="text-sm font-semibold">Origin Passport</CardTitle>
         </div>
         <CardDescription className="text-xs">
           Signed provenance tied to the beneficiary record

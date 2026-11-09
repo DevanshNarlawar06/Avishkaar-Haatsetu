@@ -40,7 +40,7 @@ def test_prompt_keeps_the_three_load_bearing_instructions():
 
 
 def test_prompt_survives_a_missing_label():
-    assert "handmade craft object" in render("")
+    assert "small-batch product" in render("")
 
 
 def test_storage_paths_do_not_collide():

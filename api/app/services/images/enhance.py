@@ -103,12 +103,13 @@ def compose_on_canvas(
 def light_studio(image_bytes: bytes, size: int = 1200) -> bytes:
     """Pillow only: the last fallback, for a server without opencv or rembg.
 
-    Upright, auto levels, a little colour and sharpness, square on a warm white
-    margin. No background removal, but a phone photo still comes back brighter
-    and better framed, so the artisan never sees "enhancement failed".
+    Grey-world white balance, auto levels, a small exposure lift, colour and
+    sharpness. The frame is kept exactly (square crop only) so the app's
+    before/after slider lines up. No background removal: that needs the
+    generative studio (Gemini image model) or rembg.
     """
     try:
-        from PIL import Image, ImageEnhance, ImageOps
+        from PIL import Image, ImageEnhance, ImageOps, ImageStat
     except ImportError as exc:
         raise ProviderUnavailableError("Pillow is not installed") from exc
 
@@ -117,19 +118,22 @@ def light_studio(image_bytes: bytes, size: int = 1200) -> bytes:
     except Exception as exc:  # unreadable upload
         raise ProviderUnavailableError(f"Could not read the photo: {exc}") from exc
 
-    img = ImageOps.autocontrast(img, cutoff=1)
-    img = ImageEnhance.Color(img).enhance(1.15)
-    img = ImageEnhance.Sharpness(img).enhance(1.25)
-
     side = min(img.size)
     left, top = (img.width - side) // 2, (img.height - side) // 2
-    img = img.crop((left, top, left + side, top + side))
-    inner = round(size * (1 - 2 * MARGIN / 2))
-    img = img.resize((inner, inner), Image.LANCZOS)
+    img = img.crop((left, top, left + side, top + side)).resize((size, size), Image.LANCZOS)
 
-    canvas = Image.new("RGB", (size, size), (250, 247, 240))
-    off = (size - inner) // 2
-    canvas.paste(img, (off, off))
+    # grey world: scale each channel so the average is neutral (removes yellow bulb cast)
+    means = ImageStat.Stat(img).mean
+    grey = sum(means) / 3
+    r, g, b = img.split()
+    r, g, b = (ch.point(lambda v, k=grey / max(m, 1): min(255, int(v * k))) for ch, m in zip((r, g, b), means))
+    img = Image.merge("RGB", (r, g, b))
+
+    img = ImageOps.autocontrast(img, cutoff=1.5)
+    img = ImageEnhance.Brightness(img).enhance(1.08)
+    img = ImageEnhance.Color(img).enhance(1.2)
+    img = ImageEnhance.Sharpness(img).enhance(1.4)
+
     out = io.BytesIO()
-    canvas.save(out, "JPEG", quality=90)
+    img.save(out, "JPEG", quality=90)
     return out.getvalue()

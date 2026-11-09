@@ -19,7 +19,7 @@ export default function DashboardPage() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           title="Programme overview"
-          subtitle="Rural producer livelihoods through digital market linkage. Current focus: handicraft artisans"
+          subtitle="Digital market linkage for every rural producer. Pilot vertical: handicraft artisans"
         />
 
         <main className="flex-1 space-y-5 p-6">
@@ -34,7 +34,7 @@ export default function DashboardPage() {
                   {BRAND.tagline}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold leading-snug tracking-tight">
-                  One voice note and one photo become a priced, verified listing on every market.
+                  Any rural producer: one voice note and one photo become a priced, verified listing on every market.
                 </h2>
               </div>
               <ul className="flex flex-wrap gap-2 text-xs">

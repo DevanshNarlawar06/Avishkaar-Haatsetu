@@ -8,6 +8,6 @@ export const BRAND = {
   tagline: "From the village haat to every market",
   taglineHi: "गाँव के हाट से हर बाज़ार तक",
   description:
-    "Voice-first digital market linkage for rural producers. Beneficiary tracking, cluster performance and income lift, starting with artisans.",
+    "Voice-first digital market linkage for rural producers. Artisans, weavers, SHG food makers, forest-produce collectors and small rural manufacturers: one platform for listing, fair pricing, provenance and impact tracking.",
   console: "Rural Livelihoods Programme Console",
 } as const;

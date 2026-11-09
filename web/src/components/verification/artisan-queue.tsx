@@ -69,9 +69,9 @@ export function ArtisanQueue() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <div>
-            <CardTitle className="text-base font-semibold">Artisan Onboarding Queue</CardTitle>
+            <CardTitle className="text-base font-semibold">Producer Onboarding Queue</CardTitle>
             <CardDescription className="text-xs mt-1">
-              Select an artisan to open the secure Level 1 verification workspace.
+              Select a producer to open the secure Level 1 verification workspace.
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={loadQueue} disabled={loading} className="gap-2">
@@ -90,16 +90,16 @@ export function ArtisanQueue() {
               <CheckCircle2 className="size-10 text-[var(--brand-success)] mb-3" />
               <h3 className="font-semibold text-base">Queue Fully Cleared</h3>
               <p className="text-xs text-muted-foreground max-w-sm mt-1">
-                All submitted artisan identity documents have been manually reviewed and approved.
+                All submitted producer identity documents have been manually reviewed and approved.
               </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow className="bg-secondary/40">
-                  <TableHead>Artisan Details</TableHead>
+                  <TableHead>Producer Details</TableHead>
                   <TableHead>Location & State</TableHead>
-                  <TableHead>Craft Category</TableHead>
+                  <TableHead>Vertical / trade</TableHead>
                   <TableHead>Submitted Date</TableHead>
                   <TableHead>Credentials</TableHead>
                   <TableHead>Status</TableHead>
@@ -124,7 +124,7 @@ export function ArtisanQueue() {
                     <TableCell>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <FileText className="size-3.5 text-amber-600" />
-                        <span>Pehchan ID: {artisan.pehchan_id || "Available"}</span>
+                        <span>Producer ID (Pehchan / NRLM): {artisan.pehchan_id || "Available"}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -135,7 +135,7 @@ export function ArtisanQueue() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild size="sm" className="bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 gap-1.5">
-                        <Link href={`/artisan-verification/${artisan.id}`}>
+                        <Link href={`/producer-verification/${artisan.id}`}>
                           Review
                           <ArrowRight className="size-3.5" />
                         </Link>

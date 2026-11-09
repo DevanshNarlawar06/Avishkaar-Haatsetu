@@ -21,11 +21,11 @@ export interface Kpi {
 export const kpis: Kpi[] = [
   {
     id: "artisans",
-    label: "Registered artisans",
+    label: "Registered producers",
     value: "12,847",
     change: 8.4,
     trend: "up",
-    note: "Onboarded across 12 states",
+    note: "Across 12 states and 4 verticals",
   },
   {
     id: "active",
@@ -53,7 +53,7 @@ export const kpis: Kpi[] = [
   },
 ];
 
-/** Median monthly artisan income, at intake and now. */
+/** Median monthly producer income, at intake and now. */
 export const incomeSeries = [
   { month: "Apr", intake: 6870, current: 7010 },
   { month: "May", intake: 6870, current: 7240 },
@@ -89,7 +89,8 @@ export const schemes: Scheme[] = [
   { id: "obc", name: "Backward Classes welfare", beneficiaries: 3410, target: 4500 },
   { id: "dnt", name: "De notified and nomadic tribes", beneficiaries: 2190, target: 2500 },
   { id: "pwd", name: "Persons with disabilities", beneficiaries: 1487, target: 2000 },
-  { id: "sr", name: "Senior citizen artisans", beneficiaries: 940, target: 1200 },
+  { id: "sr", name: "Senior citizen producers", beneficiaries: 940, target: 1200 },
+  { id: "shg", name: "DAY-NRLM SHG members", beneficiaries: 3260, target: 5000 },
 ];
 
 export interface Cluster {
@@ -97,6 +98,7 @@ export interface Cluster {
   cluster: string;
   state: string;
   craft: string;
+  vertical: string;
   artisans: number;
   listings: number;
   orders: number;
@@ -105,14 +107,14 @@ export interface Cluster {
 }
 
 export const clusters: Cluster[] = [
-  { id: "c1", cluster: "Srinagar", state: "Jammu and Kashmir", craft: "Pashmina", artisans: 1284, listings: 4120, orders: 1860, gmv: 9840000, lift: 41.2 },
-  { id: "c2", cluster: "Bagru", state: "Rajasthan", craft: "Block print", artisans: 2140, listings: 6890, orders: 3240, gmv: 7420000, lift: 38.7 },
-  { id: "c3", cluster: "Bhuj", state: "Gujarat", craft: "Bandhani", artisans: 1670, listings: 5210, orders: 2410, gmv: 6180000, lift: 33.4 },
-  { id: "c4", cluster: "Swamimalai", state: "Tamil Nadu", craft: "Bronze casting", artisans: 760, listings: 1840, orders: 690, gmv: 5940000, lift: 29.8 },
-  { id: "c5", cluster: "Shantiniketan", state: "West Bengal", craft: "Kantha", artisans: 1890, listings: 5960, orders: 2870, gmv: 4310000, lift: 36.1 },
-  { id: "c6", cluster: "Raghurajpur", state: "Odisha", craft: "Pattachitra", artisans: 1120, listings: 2740, orders: 980, gmv: 3860000, lift: 27.5 },
-  { id: "c7", cluster: "Lucknow", state: "Uttar Pradesh", craft: "Chikankari", artisans: 2310, listings: 7420, orders: 3610, gmv: 3540000, lift: 24.9 },
-  { id: "c8", cluster: "Channapatna", state: "Karnataka", craft: "Lacquer toys", artisans: 1580, listings: 3980, orders: 1740, gmv: 2970000, lift: 22.3 },
+  { id: "c1", cluster: "Srinagar", state: "Jammu and Kashmir", craft: "Pashmina", vertical: "Handicraft", artisans: 1284, listings: 4120, orders: 1860, gmv: 9840000, lift: 41.2 },
+  { id: "c2", cluster: "Pochampally", state: "Telangana", craft: "Ikat sarees", vertical: "Handloom", artisans: 1960, listings: 5480, orders: 2690, gmv: 8120000, lift: 37.9 },
+  { id: "c3", cluster: "Bagru", state: "Rajasthan", craft: "Block print", vertical: "Handicraft", artisans: 2140, listings: 6890, orders: 3240, gmv: 7420000, lift: 38.7 },
+  { id: "c4", cluster: "Wayanad", state: "Kerala", craft: "Spices and pickles (SHGs)", vertical: "SHG food", artisans: 2380, listings: 3910, orders: 4120, gmv: 5260000, lift: 31.6 },
+  { id: "c7", cluster: "Shantiniketan", state: "West Bengal", craft: "Kantha", vertical: "Handicraft", artisans: 1890, listings: 5960, orders: 2870, gmv: 4310000, lift: 36.1 },
+  { id: "c5", cluster: "Bastar", state: "Chhattisgarh", craft: "Forest honey and mahua", vertical: "Forest produce", artisans: 1450, listings: 1620, orders: 1980, gmv: 3980000, lift: 44.8 },
+  { id: "c6", cluster: "Moradabad (rural belt)", state: "Uttar Pradesh", craft: "Brassware units", vertical: "Micro-manufacturing", artisans: 870, listings: 2240, orders: 1130, gmv: 3720000, lift: 21.4 },
+  { id: "c8", cluster: "Channapatna", state: "Karnataka", craft: "Lacquer toys", vertical: "Handicraft", artisans: 1580, listings: 3980, orders: 1740, gmv: 2970000, lift: 22.3 },
 ];
 
 /** Where a listing ends up once it is published. */

@@ -3,8 +3,8 @@ window.DEMO = (function () {
   const artisan = {
     name: "Kamla Devi",
     nameHi: "कमला देवी",
-    place: "Madhubani, Bihar",
-    placeHi: "मधुबनी, बिहार",
+    place: "Mithila Mahila SHG · Madhubani, Bihar",
+    placeHi: "मिथिला महिला स्वयं सहायता समूह · मधुबनी, बिहार",
     state: "BR",
     id: "ART-BR-0427",
   };
@@ -55,6 +55,21 @@ window.DEMO = (function () {
       category: "bamboo_cane",
       estimated_hours: 12,
       material_cost: 120,
+    },
+    {
+      kind: "jar",
+      transcript: "हमारे समूह ने कच्चे आम का अचार बनाया है, सरसों के तेल में, घर के मसालों से। कोई केमिकल नहीं। 500 ग्राम का जार है। पूरे बैच में दो दिन लगे, एक जार पर करीब दो घंटे।",
+      detected_language: "hi",
+      title_en: "Homemade Raw Mango Pickle in Mustard Oil, 500 g",
+      title_hi: "सरसों के तेल में घर का बना कच्चे आम का अचार, 500 ग्राम",
+      description_en: "Raw mango pickle made in small batches by a women's self-help group in Madhubani, using cold-pressed mustard oil and spices ground at home. No preservatives or added colour. Packed in a 500 g glass jar.",
+      description_hi: "मधुबनी की महिला स्वयं सहायता समूह द्वारा छोटे बैच में बनाया गया कच्चे आम का अचार, कच्ची घानी सरसों के तेल और घर में पिसे मसालों के साथ। कोई प्रिज़र्वेटिव या रंग नहीं। 500 ग्राम काँच के जार में।",
+      tags: ["mango pickle", "aam ka achar", "homemade", "mustard oil", "shg product", "no preservatives"],
+      materials: ["raw mango", "mustard oil", "spices"],
+      technique: "Sun-cured pickling (SHG batch)",
+      category: "food_products",
+      estimated_hours: 2,
+      material_cost: 110,
     },
   ];
 
@@ -142,7 +157,21 @@ window.DEMO = (function () {
     ctx.lineWidth = 9; ctx.beginPath(); ctx.ellipse(cx, top, w * .22, h * .22, 0, Math.PI, 0); ctx.stroke();
   }
 
-  const painters = { painting, pottery, basket };
+  function jar(ctx, w, h) {
+    const cx = w * .5, top = h * .3, base = h * .82, jw = w * .3;
+    ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.ellipse(cx + 10, base + 6, jw * .9, h * .03, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = "rgba(220,235,240,.55)"; ctx.fillRect(cx - jw / 2, top, jw, base - top);
+    ctx.fillStyle = "#c8641b"; ctx.fillRect(cx - jw / 2 + 8, top + (base - top) * .18, jw - 16, (base - top) * .8);
+    ctx.fillStyle = "#e9a43a";
+    for (let i = 0; i < 26; i++) { const x = cx - jw / 2 + 16 + (i * 37) % (jw - 32), y = top + (base - top) * .25 + ((i * 53) % ((base - top) * .68)); ctx.beginPath(); ctx.ellipse(x, y, 14, 9, i, 0, 7); ctx.fill(); }
+    ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(cx - jw / 2 + 12, top + 10, 12, base - top - 20);
+    ctx.fillStyle = "#b5322b"; ctx.beginPath(); ctx.moveTo(cx - jw / 2 - 18, top + 10); ctx.lineTo(cx + jw / 2 + 18, top + 10); ctx.lineTo(cx + jw / 2 + 6, top - 40); ctx.lineTo(cx - jw / 2 - 6, top - 40); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#e0a21b"; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(cx - jw / 2 - 10, top); ctx.lineTo(cx + jw / 2 + 10, top); ctx.stroke();
+    ctx.fillStyle = "#f6edd8"; ctx.fillRect(cx - jw * .32, top + (base - top) * .42, jw * .64, (base - top) * .22);
+    ctx.fillStyle = "#1D4B39"; ctx.font = "bold 30px sans-serif"; ctx.textAlign = "center"; ctx.fillText("आम अचार", cx, top + (base - top) * .55);
+  }
+
+  const painters = { painting, pottery, basket, jar };
 
   /** A dim, slightly blue, off-centre phone photo of the product, as a JPEG data URL. */
   function samplePhoto(kind) {
@@ -182,6 +211,11 @@ window.DEMO = (function () {
         listing: listings[2], hours: 12, material_cost: 120, price: 1150, floor: 941, channels: ["store", "b2b"],
         status: "published", sold: 3,
       },
+      {
+        id: "demo-3", created: now - 86400000 * 3, kind: "jar",
+        listing: listings[3], hours: 2, material_cost: 110, price: 290, floor: 0, channels: ["store", "ondc", "wa"],
+        status: "published", sold: 14,
+      },
     ].map((p) => (p.floor = floorOf(p.hours, p.material_cost).floor, p.price = Math.max(p.price, p.floor), p));
   }
 
@@ -194,7 +228,7 @@ window.DEMO = (function () {
   }
 
   // Demo market band per category, as multiples of the floor (the live API uses its LightGBM model).
-  const BAND = { painting: [1.05, 1.45, 2.1], pottery: [0.9, 1.25, 1.75], bamboo_cane: [0.95, 1.3, 1.8], other: [1, 1.3, 1.8] };
+  const BAND = { painting: [1.05, 1.45, 2.1], pottery: [0.9, 1.25, 1.75], bamboo_cane: [0.95, 1.3, 1.8], food_products: [1.2, 1.5, 1.9], forest_produce: [1.1, 1.4, 1.8], other: [1, 1.3, 1.8] };
   function priceOf(category, hours, material) {
     const f = floorOf(hours, material);
     const m = BAND[category] || BAND.other;

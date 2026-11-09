@@ -8,8 +8,8 @@ export default function ArtisanVerificationPage() {
       <Sidebar />
       <div className="flex flex-1 flex-col">
         <Topbar
-          title="Artisan Verification"
-          subtitle="Internal review queue for pending artisan onboarding & identity verification"
+          title="Producer Verification"
+          subtitle="Internal review queue for pending producer onboarding & identity verification"
         />
         <main className="flex-1 space-y-5 p-6">
           <ArtisanQueue />

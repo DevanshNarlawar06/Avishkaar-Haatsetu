@@ -17,7 +17,7 @@ this domain. A garment flatlay wants creases relaxed. A handmade pot does not
 want its asymmetry corrected, because that asymmetry is the product.
 """
 
-FLATLAY_PROMPT = """Turn this photograph of a single handmade object into a clean product image of
+FLATLAY_PROMPT = """Turn this photograph of a single product into a clean product image of
 it, on a pure white background.
 
 The object is: {label}
@@ -65,4 +65,4 @@ that still contains a person is a failed generation, not a stylistic choice."""
 
 def render(label: str) -> str:
     """Fill the prompt for one object."""
-    return FLATLAY_PROMPT.format(label=label or "a handmade craft object")
+    return FLATLAY_PROMPT.format(label=label or "a rural handmade or small-batch product")

@@ -8,7 +8,7 @@ export default function CataloguePage() {
     <div className="flex min-h-full">
       <Sidebar />
       <div className="flex flex-1 flex-col">
-        <Topbar title="Catalogue" subtitle="Multilingual artisan product listings" />
+        <Topbar title="Catalogue" subtitle="Multilingual listings from every producer vertical" />
         <main className="flex-1 space-y-5 p-6">
           <Card>
             <CardContent className="flex flex-col items-center justify-center p-12 text-center">

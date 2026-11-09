@@ -36,8 +36,8 @@ export function ClusterTable() {
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className="pl-6">Cluster</TableHead>
-                <TableHead>Craft</TableHead>
-                <TableHead className="text-right">Artisans</TableHead>
+                <TableHead>Product / trade</TableHead>
+                <TableHead className="text-right">Producers</TableHead>
                 <TableHead className="text-right">Listings</TableHead>
                 <TableHead className="text-right">Orders</TableHead>
                 <TableHead className="text-right">Value sold</TableHead>
@@ -54,8 +54,9 @@ export function ClusterTable() {
                       {c.state}
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {c.craft}
+                  <TableCell>
+                    <div className="text-muted-foreground">{c.craft}</div>
+                    <div className="text-xs font-medium text-[var(--brand-leaf)]">{c.vertical}</div>
                   </TableCell>
                   <TableCell className="tabular text-right">
                     {c.artisans.toLocaleString("en-IN")}
