@@ -1,0 +1,179 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-jetbrains);
+  --font-heading: var(--font-jakarta);
+  --font-deva: var(--font-mukta);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* HaatSetu palette.
+   Leaf green for trust and growth, marigold for the haat itself: the colour of
+   a village market stall. Keep these in step with the mobile app's colours. */
+:root {
+  --radius: 0.75rem;
+
+  --background: #F6F4EC;   /* paper */
+  --foreground: #17211B;   /* ink */
+
+  --card: #FFFFFF;
+  --card-foreground: #17211B;
+  --popover: #FFFFFF;
+  --popover-foreground: #17211B;
+
+  --primary: #1D4B39;      /* leaf */
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #EEEBE0;
+  --secondary-foreground: #17211B;
+
+  --muted: #EEEBE0;
+  --muted-foreground: #626A61;
+
+  --accent: #FBEBD0;       /* marigold wash */
+  --accent-foreground: #6A3E06;
+
+  --destructive: #B3261E;  /* chili */
+
+  --border: #E2DFD3;
+  --input: #E2DFD3;
+  --ring: #E08A1E;         /* marigold */
+
+  /* Charts read left to right as: primary series, comparison, target,
+     positive, and a neutral remainder. */
+  --chart-1: #E08A1E;
+  --chart-2: #1D4B39;
+  --chart-3: #4253A6;
+  --chart-4: #2F8552;
+  --chart-5: #9CA398;
+
+  /* The sidebar is the one dark surface, so the brand reads at a glance. */
+  --sidebar: #133429;
+  --sidebar-foreground: #E6EEE8;
+  --sidebar-primary: #F2B24C;
+  --sidebar-primary-foreground: #133429;
+  --sidebar-accent: rgba(242, 178, 76, 0.14);
+  --sidebar-accent-foreground: #F7C979;
+  --sidebar-border: rgba(230, 238, 232, 0.10);
+  --sidebar-ring: #F2B24C;
+
+  /* Brand tokens used directly where a semantic slot would be misleading. */
+  --brand-leaf: #1D4B39;
+  --brand-marigold: #E08A1E;
+  --brand-chili: #B3261E;
+  --brand-turmeric: #D9A21B;
+  --brand-indigo: #4253A6;
+  --brand-success: #2F8552;
+  --brand-ink-faint: #8E958B;
+}
+
+.dark {
+  --background: #0F1612;
+  --foreground: #E9EFE9;
+
+  --card: #16201B;
+  --card-foreground: #E9EFE9;
+  --popover: #16201B;
+  --popover-foreground: #E9EFE9;
+
+  --primary: #8FD1AE;
+  --primary-foreground: #0C2219;
+
+  --secondary: #1F2A24;
+  --secondary-foreground: #E9EFE9;
+
+  --muted: #1F2A24;
+  --muted-foreground: #9AA79E;
+
+  --accent: #3A2A12;
+  --accent-foreground: #FBDCA6;
+
+  --destructive: #F07167;
+
+  --border: rgba(233, 239, 233, 0.12);
+  --input: rgba(233, 239, 233, 0.16);
+  --ring: #F2B24C;
+
+  --chart-1: #F2B24C;
+  --chart-2: #8FD1AE;
+  --chart-3: #9AA8F0;
+  --chart-4: #6CCB92;
+  --chart-5: #7A847C;
+
+  --sidebar: #0B120E;
+  --sidebar-foreground: #E6EEE8;
+  --sidebar-primary: #F2B24C;
+  --sidebar-primary-foreground: #0B120E;
+  --sidebar-accent: rgba(242, 178, 76, 0.14);
+  --sidebar-accent-foreground: #F7C979;
+  --sidebar-border: rgba(230, 238, 232, 0.10);
+  --sidebar-ring: #F2B24C;
+
+  --brand-leaf: #8FD1AE;
+  --brand-marigold: #F2B24C;
+  --brand-chili: #F07167;
+  --brand-turmeric: #E9C25A;
+  --brand-indigo: #9AA8F0;
+  --brand-success: #6CCB92;
+  --brand-ink-faint: #7A847C;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* Figures line up in columns. Without this, a table of rupee amounts
+     wobbles as the digits change. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}

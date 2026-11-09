@@ -1,0 +1,75 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1400px; height: 400px; background: #fff; font-family: "Segoe UI", Arial, sans-serif; color: #17211B; padding: 18px 20px; }
+  .row { display: flex; align-items: stretch; gap: 0; height: 262px; }
+  .stage { flex: 1; border-radius: 16px; padding: 16px 18px; border: 2px solid #E2DFD3; background: #F6F4EC; display: flex; flex-direction: column; }
+  .stage.ai { flex: 1.5; background: #1D4B39; border-color: #1D4B39; color: #fff; }
+  .num { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #E08A1E; }
+  .ai .num { color: #F7C979; }
+  h3 { font-size: 22px; margin: 4px 0 10px; }
+  ul { padding-left: 18px; font-size: 16.5px; line-height: 1.45; }
+  .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px; }
+  .chip { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 10px; padding: 9px 11px; font-size: 15px; line-height: 1.3; }
+  .chip b { display: block; color: #F7C979; font-size: 15.5px; }
+  .arrow { width: 44px; display: flex; align-items: center; justify-content: center; }
+  .arrow svg { width: 34px; height: 34px; }
+  .bar { margin-top: 14px; height: 76px; border-radius: 14px; background: #FBEBD0; border: 2px solid #F0C98C; display: flex; align-items: center; gap: 18px; padding: 0 22px; font-size: 17px; }
+  .bar b { color: #6A3E06; font-size: 18px; white-space: nowrap; }
+  .tag { background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 15px; border: 1px solid #F0C98C; white-space: nowrap; }
+</style></head>
+<body>
+  <div class="row">
+    <div class="stage">
+      <div class="num">Step 1 · Capture</div>
+      <h3>Artisan speaks &amp; snaps</h3>
+      <ul>
+        <li>Voice note in own language</li>
+        <li>One phone photo</li>
+        <li>Materials &amp; hours spent</li>
+        <li>Works offline, syncs later</li>
+      </ul>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6" fill="none" stroke="#E08A1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="stage ai">
+      <div class="num">Step 2 · HaatSetu AI (server-side)</div>
+      <h3>Listing, image, price, proof</h3>
+      <div class="chips">
+        <div class="chip"><b>Voice → listing</b>Gemini / Bhashini: bilingual title, story, attributes</div>
+        <div class="chip"><b>AI photo studio</b>Clean, e-commerce-ready product image</div>
+        <div class="chip"><b>Fair-price engine</b>Wage floor + LightGBM P10–P90 band</div>
+        <div class="chip"><b>Craft Passport</b>Ed25519-signed QR / NFC provenance</div>
+      </div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6" fill="none" stroke="#E08A1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="stage">
+      <div class="num">Step 3 · Review</div>
+      <h3>Artisan approves</h3>
+      <ul>
+        <li>Hears listing read back</li>
+        <li>Edits by voice or tap</li>
+        <li>Price never below the wage floor</li>
+      </ul>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6" fill="none" stroke="#E08A1E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="stage">
+      <div class="num">Step 4 · Sell everywhere</div>
+      <h3>List once, reach all</h3>
+      <ul>
+        <li>HaatSetu storefront</li>
+        <li>ONDC &amp; social commerce</li>
+        <li>B2B leads, GeM</li>
+        <li>Buyer scans QR to verify</li>
+      </ul>
+    </div>
+  </div>
+  <div class="bar">
+    <b>Programme console</b>
+    <span class="tag">Artisan verification</span>
+    <span class="tag">Beneficiaries by scheme</span>
+    <span class="tag">Cluster performance</span>
+    <span class="tag">Income at intake vs now</span>
+    <span class="tag">Passport audit</span>
+  </div>
+</body></html>
