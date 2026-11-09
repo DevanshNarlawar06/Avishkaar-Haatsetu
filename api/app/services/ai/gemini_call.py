@@ -2,7 +2,8 @@
 
 Free-tier models return 503 "high demand" or 429 often enough to break a live
 demo. Each busy model gets one short retry, then the next model in
-GEMINI_FALLBACK_MODELS is tried. Any other error is raised at once.
+GEMINI_FALLBACK_MODELS is tried; a retired model (404) is skipped at once. Any other
+error is raised.
 """
 
 from __future__ import annotations
@@ -15,6 +16,8 @@ from app.core.logging import get_logger
 log = get_logger(__name__)
 
 BUSY = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "overloaded", "high demand")
+# A retired or unknown model: no point retrying it, go straight to the next one.
+GONE = ("404", "NOT_FOUND", "no longer available")
 
 
 def _busy(exc: Exception) -> bool:
@@ -35,6 +38,10 @@ def generate(client, **kwargs):
             try:
                 return client.models.generate_content(model=model, **kwargs)
             except Exception as exc:  # noqa: BLE001 - upstream raises many types
+                if any(marker in str(exc) for marker in GONE):
+                    last = exc
+                    log.warning("gemini_model_unavailable", model=model, error=str(exc)[:160])
+                    break
                 if not _busy(exc):
                     raise
                 last = exc
