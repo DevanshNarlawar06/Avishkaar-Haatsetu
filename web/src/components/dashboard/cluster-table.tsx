@@ -73,7 +73,7 @@ export function ClusterTable() {
                   <TableCell className="pr-6 text-right">
                     <Badge
                       variant="outline"
-                      className="tabular gap-0.5 border-teal bg-teal/10 font-bold text-teal"
+                      className="tabular gap-0.5 border-teal bg-teal/10 font-bold text-ink"
                     >
                       <ArrowUpRight className="size-3" aria-hidden />
                       <span className="sr-only">up </span>

@@ -174,7 +174,7 @@ export function VerificationWorkspace({ artisanId }: { artisanId: string }) {
           <p
             className={cn(
               "flex items-start gap-2 rounded-xl border-2 p-3 text-base font-semibold",
-              notice.tone === "ok" ? "border-teal bg-teal/10 text-teal" : "border-brick bg-brick/10 text-brick",
+              notice.tone === "ok" ? "border-teal bg-teal/10 text-ink" : "border-brick bg-brick/10 text-brick",
             )}
           >
             {notice.tone === "ok" ? <CheckCircle2 className="mt-0.5 size-5 shrink-0" aria-hidden /> : <AlertCircle className="mt-0.5 size-5 shrink-0" aria-hidden />}

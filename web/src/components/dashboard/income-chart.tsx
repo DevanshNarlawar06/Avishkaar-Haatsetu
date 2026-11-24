@@ -42,7 +42,7 @@ export function IncomeChart() {
         <CardAction>
           <Badge
             variant="outline"
-            className="border-teal bg-teal/10 font-bold text-teal"
+            className="border-teal bg-teal/10 font-bold text-ink"
           >
             Up 34.6 percent
           </Badge>

@@ -6,9 +6,10 @@
 
 | Folder | What it is |
 | --- | --- |
-| `web/` | Next.js programme console (verification, beneficiaries, clusters, income lift) |
+| `web/` | Next.js landing page (`/`) and programme console (`/console`: verification, beneficiaries, clusters, passports) |
 | `api/` | FastAPI backend: voice-to-listing, image studio, fair-price engine, signed Craft Passport |
 | `mobile_app/` | Android artisan app (APK): speak, photo studio, fair price, Craft Passport; demo mode works offline |
+| `DESIGN.md` | Design system shared by the web and the app (colours, type, accessibility rules) |
 | `docs/problem-statement.md` | Reframed problem statement with sourced statistics |
 | `submission/` | Abstract (.docx/.pdf), pitch deck (.pptx/.pdf), figures |
 
