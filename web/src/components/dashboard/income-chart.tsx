@@ -33,16 +33,16 @@ export function IncomeChart() {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-sm font-semibold">
+        <CardTitle>
           Median monthly producer income
         </CardTitle>
-        <CardDescription className="text-xs">
+        <CardDescription>
           Compared against income recorded at intake
         </CardDescription>
         <CardAction>
           <Badge
             variant="outline"
-            className="border-[var(--brand-success)]/40 text-[var(--brand-success)]"
+            className="border-teal bg-teal/10 font-bold text-teal"
           >
             Up 34.6 percent
           </Badge>
@@ -65,13 +65,13 @@ export function IncomeChart() {
               tickLine={false}
               axisLine={false}
               tickMargin={10}
-              fontSize={11}
+              fontSize={13}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
               width={46}
-              fontSize={11}
+              fontSize={13}
               tickFormatter={(v: number) => `₹${(v / 1000).toFixed(0)}k`}
             />
             <ChartTooltip
@@ -106,7 +106,7 @@ export function IncomeChart() {
               dataKey="current"
               type="monotone"
               stroke="var(--chart-1)"
-              strokeWidth={2}
+              strokeWidth={3}
               fill="url(#fillCurrent)"
               isAnimationActive={false}
             />

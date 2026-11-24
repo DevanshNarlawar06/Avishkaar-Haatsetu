@@ -41,7 +41,8 @@ export interface ArtisanDetail {
   product_count: number;
 }
 
-export async function fetchPendingVerifications(): Promise<PendingArtisan[]> {
+/** Returns null when the API cannot be reached, so the queue can say so instead of looking empty. */
+export async function fetchPendingVerifications(): Promise<PendingArtisan[] | null> {
   try {
     const res = await fetch(`${API_BASE_URL}/ministry/verification/pending`, {
       cache: "no-store",
@@ -52,12 +53,16 @@ export async function fetchPendingVerifications(): Promise<PendingArtisan[]> {
   } catch (err) {
     console.warn("API fetch error", err);
   }
-  return [];
+  return null;
 }
 
-export async function fetchArtisanDetail(id: string): Promise<ArtisanDetail> {
+/**
+ * Returns null when the record cannot be loaded. The workspace shows an error
+ * instead of a stand-in profile: an officer must never review invented data.
+ */
+export async function fetchArtisanDetail(id: string): Promise<ArtisanDetail | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/ministry/verification/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/ministry/verification/${encodeURIComponent(id)}`, {
       cache: "no-store",
     });
     if (res.ok) {
@@ -66,30 +71,7 @@ export async function fetchArtisanDetail(id: string): Promise<ArtisanDetail> {
   } catch (err) {
     console.warn("API fetch error", err);
   }
-
-  return {
-    id,
-    user_id: id,
-    name: "Producer Profile",
-    phone: "+91 98000 00000",
-    email: "artisan@example.com",
-    state: "India",
-    district: "Central District",
-    cluster: "Producer Cluster",
-    craft: "Traditional trade",
-    scheme: "none",
-    beneficiary_id: "PHN-IN-0001",
-    intake_monthly_income: 5000,
-    submitted_date: "06 Sep 2026",
-    is_verified: false,
-    verification_status: "Pending",
-    verification_document_url:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Aadhaar_letter_large.png/640px-Aadhaar_letter_large.png",
-    pehchan_id: "PHN-IN-0001",
-    pehchan_status: "Pending Verification",
-    workspace_verification_status: "Not Requested",
-    product_count: 1,
-  };
+  return null;
 }
 
 export async function approveArtisan(id: string): Promise<boolean> {
@@ -97,7 +79,7 @@ export async function approveArtisan(id: string): Promise<boolean> {
   // success leaves an artisan unverified while the officer believes they are
   // cleared, and nothing downstream ever catches it.
   try {
-    const res = await fetch(`${API_BASE_URL}/ministry/verification/${id}/approve`, {
+    const res = await fetch(`${API_BASE_URL}/ministry/verification/${encodeURIComponent(id)}/approve`, {
       method: "POST",
     });
     return res.ok;
@@ -109,7 +91,7 @@ export async function approveArtisan(id: string): Promise<boolean> {
 
 export async function requestMoreInfo(id: string, reason: string): Promise<boolean> {
   try {
-    const res = await fetch(`${API_BASE_URL}/ministry/verification/${id}/action-required`, {
+    const res = await fetch(`${API_BASE_URL}/ministry/verification/${encodeURIComponent(id)}/action-required`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ reason }),

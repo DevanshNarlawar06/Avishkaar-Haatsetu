@@ -1,62 +1,56 @@
 "use client";
 
-import { CalendarRange, Download, Search } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
+import { Menu } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ConsoleNav, VerticalsPanel } from "@/components/shell/sidebar";
 import { Wordmark } from "@/components/shell/wordmark";
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { BRAND } from "@/lib/brand";
 
-export function Topbar({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle?: string;
-}) {
+/**
+ * Page header. On phones and tablets it also carries the menu, because the
+ * sidebar is hidden below the lg breakpoint.
+ */
+export function Topbar({ title, subtitle }: { title: string; subtitle?: string }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur">
-      <div className="flex h-[72px] items-center gap-4 px-6">
-        <div className="lg:hidden">
-          <Wordmark />
+    <header className="sticky top-0 z-20 border-b-2 border-ink bg-paper/95 backdrop-blur">
+      <div className="flex min-h-[76px] items-center gap-4 px-4 py-3 sm:px-6">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger
+            className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-ink bg-cream lg:hidden"
+            aria-label="Open menu"
+          >
+            <Menu className="size-5" aria-hidden />
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="w-80 gap-6 overflow-y-auto border-r-2 border-ink bg-indigo p-5 text-cream [&_[data-slot=sheet-close]]:text-cream"
+          >
+            <SheetTitle className="sr-only">Console menu</SheetTitle>
+            <SheetDescription className="sr-only">{BRAND.console}</SheetDescription>
+            <Link href="/" onClick={() => setOpen(false)} className="rounded-xl">
+              <Wordmark showTagline onDark />
+            </Link>
+            <ConsoleNav onNavigate={() => setOpen(false)} />
+            <VerticalsPanel />
+          </SheetContent>
+        </Sheet>
+
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold leading-tight sm:text-2xl">{title}</h1>
+          {subtitle ? <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{subtitle}</p> : null}
         </div>
 
-        <div className="hidden min-w-0 flex-1 lg:block">
-          <h1 className="truncate text-lg font-bold leading-tight tracking-tight">
-            {title}
-          </h1>
-          {subtitle ? (
-            <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
-          ) : null}
-        </div>
-
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Search">
-            <Search className="size-4" />
-          </Button>
-
-          <Select defaultValue="fy26">
-            <SelectTrigger className="h-9 w-[172px] rounded-lg bg-card text-xs">
-              <CalendarRange className="size-3.5 text-muted-foreground" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="fy26">Financial year 2026</SelectItem>
-              <SelectItem value="q3">Quarter 3</SelectItem>
-              <SelectItem value="m">This month</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button size="sm" className="h-9 gap-2 rounded-lg text-xs">
-            <Download className="size-3.5" />
-            Export
-          </Button>
-        </div>
+        <span
+          className="hidden shrink-0 rounded-full border-2 border-ink bg-saffron px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink sm:inline-flex"
+          title="Figures on this console are sample data"
+        >
+          Sample data
+        </span>
       </div>
     </header>
   );

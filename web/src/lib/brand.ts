@@ -1,13 +1,14 @@
 /**
- * The product's name and copy live here, so a rename is a one-file change.
+ * The product's name and fixed copy. A rename is a one-file change.
  */
 export const BRAND = {
   name: "HaatSetu",
-  // Split for the two-tone wordmark.
-  nameParts: ["Haat", "Setu"] as const,
+  headline: "Her craft. Her voice. Her price.",
   tagline: "From the village haat to every market",
   taglineHi: "गाँव के हाट से हर बाज़ार तक",
   description:
-    "Voice-first digital market linkage for rural producers. Artisans, weavers, SHG food makers, forest-produce collectors and small rural manufacturers: one platform for listing, fair pricing, provenance and impact tracking.",
+    "A voice-first agent system that turns a 30-second voice note into a verified, fairly priced listing on every channel. It never commits without the producer's yes.",
   console: "Rural Livelihoods Programme Console",
+  repo: "https://github.com/DevanshNarlawar06/Avishkaar-Haatsetu",
+  apk: "https://github.com/DevanshNarlawar06/Avishkaar-Haatsetu/raw/main/submission/HaatSetu.apk",
 } as const;

@@ -22,10 +22,10 @@ export function ClusterTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm font-semibold">
+        <CardTitle>
           Cluster performance
         </CardTitle>
-        <CardDescription className="text-xs">
+        <CardDescription>
           Ranked by value of goods sold this financial year
         </CardDescription>
       </CardHeader>
@@ -56,7 +56,7 @@ export function ClusterTable() {
                   </TableCell>
                   <TableCell>
                     <div className="text-muted-foreground">{c.craft}</div>
-                    <div className="text-xs font-medium text-[var(--brand-leaf)]">{c.vertical}</div>
+                    <div className="text-xs font-semibold text-indigo">{c.vertical}</div>
                   </TableCell>
                   <TableCell className="tabular text-right">
                     {c.artisans.toLocaleString("en-IN")}
@@ -73,9 +73,10 @@ export function ClusterTable() {
                   <TableCell className="pr-6 text-right">
                     <Badge
                       variant="outline"
-                      className="tabular gap-0.5 border-[var(--brand-success)]/35 font-medium text-[var(--brand-success)]"
+                      className="tabular gap-0.5 border-teal bg-teal/10 font-bold text-teal"
                     >
-                      <ArrowUpRight className="size-3" />
+                      <ArrowUpRight className="size-3" aria-hidden />
+                      <span className="sr-only">up </span>
                       {c.lift}%
                     </Badge>
                   </TableCell>

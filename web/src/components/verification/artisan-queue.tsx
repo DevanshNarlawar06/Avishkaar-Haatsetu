@@ -1,143 +1,141 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowRight, CheckCircle2, Clock, CloudOff, RefreshCw } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { fetchPendingVerifications, PendingArtisan } from "@/lib/api";
-import { CheckCircle2, Clock, ShieldAlert, ArrowRight, RefreshCw, FileText } from "lucide-react";
+import { fetchPendingVerifications, type PendingArtisan } from "@/lib/api";
+
+type QueueState = { status: "loading" } | { status: "error" } | { status: "ready"; items: PendingArtisan[] };
+
+const protocol = ["Retrieve document", "Cross-check details", "Officer approves"];
 
 export function ArtisanQueue() {
-  const [artisans, setArtisans] = useState<PendingArtisan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<QueueState>({ status: "loading" });
 
-  const loadQueue = async () => {
-    setLoading(true);
+  const load = useCallback(async () => {
+    setState({ status: "loading" });
     const data = await fetchPendingVerifications();
-    setArtisans(data.filter((a) => !a.is_verified));
-    setLoading(false);
-  };
+    setState(data ? { status: "ready", items: data.filter((a) => !a.is_verified) } : { status: "error" });
+  }, []);
 
   useEffect(() => {
-    loadQueue();
-  }, []);
+    // Initial fetch on mount; the queue is client-side so the Refresh button can reuse it.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load();
+  }, [load]);
+
+  const count = state.status === "ready" ? state.items.length : null;
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Stats */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Review Queue</CardTitle>
-            <Clock className="size-4 text-amber-600" />
-          </CardHeader>
+        <Card>
           <CardContent>
-            <div className="text-2xl font-bold tabular">{artisans.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Aadhaar documents awaiting manual verification</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Verification Stage</CardTitle>
-            <Badge variant="outline" className="border-amber-500 text-amber-700 bg-amber-50">
-              Level 1 Active
-            </Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm font-medium">Manual Identity Cross-Check</div>
-            <p className="text-xs text-muted-foreground mt-1">Level 2 & 3 available as upcoming stages</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Verification Protocol</CardTitle>
-            <ShieldAlert className="size-4 text-[var(--primary)]" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs font-mono text-muted-foreground leading-relaxed">
-              Retrieve Document &rarr; Cross-Check Details &rarr; Manual Officer Approval
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-muted-foreground">Waiting for review</p>
+              <Clock className="size-5 text-brick" aria-hidden />
             </div>
+            <p className="tabular font-heading text-3xl font-bold">{count ?? "—"}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <p className="text-sm font-semibold text-muted-foreground">Active stage</p>
+            <p className="font-heading text-xl font-bold">Level 1 · Identity</p>
+            <p className="text-sm text-muted-foreground">Levels 2 and 3 come next</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <p className="text-sm font-semibold text-muted-foreground">Protocol</p>
+            <ol className="mt-1 space-y-1 text-sm font-medium">
+              {protocol.map((p, i) => (
+                <li key={p}>
+                  <span className="tabular text-brick">{i + 1}.</span> {p}
+                </li>
+              ))}
+            </ol>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Table */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
-          <div>
-            <CardTitle className="text-base font-semibold">Producer Onboarding Queue</CardTitle>
-            <CardDescription className="text-xs mt-1">
-              Select a producer to open the secure Level 1 verification workspace.
-            </CardDescription>
-          </div>
-          <Button variant="outline" size="sm" onClick={loadQueue} disabled={loading} className="gap-2">
-            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
-            Refresh Queue
-          </Button>
+        <CardHeader>
+          <CardTitle>Onboarding queue</CardTitle>
+          <CardDescription>Open a producer to check their documents and approve them.</CardDescription>
+          <CardAction>
+            <Button variant="outline" onClick={load} disabled={state.status === "loading"}>
+              <RefreshCw className={state.status === "loading" ? "animate-spin" : undefined} aria-hidden />
+              Refresh
+            </Button>
+          </CardAction>
         </CardHeader>
 
-        <CardContent className="p-0">
-          {loading ? (
-            <div className="flex h-48 items-center justify-center text-sm text-muted-foreground">
-              Loading pending verification queue...
+        <CardContent className="px-0" aria-live="polite">
+          {state.status === "loading" ? (
+            <p className="px-5 py-16 text-center text-base text-muted-foreground">Loading the queue…</p>
+          ) : state.status === "error" ? (
+            <div className="flex flex-col items-center px-5 py-12 text-center">
+              <CloudOff className="size-10 text-brick" aria-hidden />
+              <h3 className="mt-3 text-lg font-bold">Could not reach the HaatSetu API</h3>
+              <p className="mt-1 max-w-md text-base text-muted-foreground">
+                The queue is unavailable right now. Nothing has been changed. Try again in a moment.
+              </p>
+              <Button className="mt-4" onClick={load}>
+                Try again
+              </Button>
             </div>
-          ) : artisans.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12 text-center">
-              <CheckCircle2 className="size-10 text-[var(--brand-success)] mb-3" />
-              <h3 className="font-semibold text-base">Queue Fully Cleared</h3>
-              <p className="text-xs text-muted-foreground max-w-sm mt-1">
-                All submitted producer identity documents have been manually reviewed and approved.
+          ) : state.items.length === 0 ? (
+            <div className="flex flex-col items-center px-5 py-12 text-center">
+              <CheckCircle2 className="size-10 text-teal" aria-hidden />
+              <h3 className="mt-3 text-lg font-bold">Queue is clear</h3>
+              <p className="mt-1 max-w-md text-base text-muted-foreground">
+                Every submitted producer has been reviewed.
               </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="bg-secondary/40">
-                  <TableHead>Producer Details</TableHead>
-                  <TableHead>Location & State</TableHead>
-                  <TableHead>Vertical / trade</TableHead>
-                  <TableHead>Submitted Date</TableHead>
-                  <TableHead>Credentials</TableHead>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="pl-5">Producer</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Trade</TableHead>
+                  <TableHead>Submitted</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+                  <TableHead className="pr-5 text-right">
+                    <span className="sr-only">Action</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {artisans.map((artisan) => (
-                  <TableRow key={artisan.id} className="hover:bg-muted/30">
-                    <TableCell className="font-medium">
-                      <div className="font-semibold text-foreground">{artisan.name}</div>
-                      <div className="text-xs font-mono text-muted-foreground">ID: {artisan.id}</div>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      <div>{artisan.district || "District"}</div>
-                      <div className="text-xs text-muted-foreground">{artisan.state}</div>
-                    </TableCell>
-                    <TableCell className="text-sm">{artisan.craft || "Handicrafts"}</TableCell>
-                    <TableCell className="text-sm tabular text-muted-foreground">
-                      {artisan.submitted_date}
+                {state.items.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell className="pl-5">
+                      <div className="text-base font-semibold">{a.name}</div>
+                      <div className="font-mono text-xs text-muted-foreground">{a.id}</div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <FileText className="size-3.5 text-amber-600" />
-                        <span>Producer ID (Pehchan / NRLM): {artisan.pehchan_id || "Available"}</span>
-                      </div>
+                      <div>{a.district ?? "—"}</div>
+                      <div className="text-xs text-muted-foreground">{a.state}</div>
                     </TableCell>
+                    <TableCell>{a.craft ?? "—"}</TableCell>
+                    <TableCell className="tabular text-muted-foreground">{a.submitted_date}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="border-amber-400 bg-amber-50 text-amber-800 font-normal">
-                        <Clock className="size-3 mr-1" />
-                        {artisan.verification_status || "Pending"}
+                      <Badge className="border-ink bg-saffron text-ink">
+                        <Clock aria-hidden />
+                        {a.verification_status || "Pending"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <Button asChild size="sm" className="bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 gap-1.5">
-                        <Link href={`/producer-verification/${artisan.id}`}>
-                          Review
-                          <ArrowRight className="size-3.5" />
+                    <TableCell className="pr-5 text-right">
+                      <Button asChild size="sm">
+                        <Link href={`/console/verification/${encodeURIComponent(a.id)}`}>
+                          Review <span className="sr-only">{a.name}</span>
+                          <ArrowRight aria-hidden />
                         </Link>
                       </Button>
                     </TableCell>

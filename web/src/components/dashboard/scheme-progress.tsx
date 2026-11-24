@@ -13,10 +13,10 @@ export function SchemeProgress() {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-sm font-semibold">
+        <CardTitle>
           Beneficiaries by scheme
         </CardTitle>
-        <CardDescription className="text-xs">
+        <CardDescription>
           Onboarded producers against the target for each category
         </CardDescription>
       </CardHeader>
@@ -27,15 +27,15 @@ export function SchemeProgress() {
           return (
             <div key={scheme.id}>
               <div className="flex items-baseline justify-between gap-3">
-                <span className="text-xs font-medium">{scheme.name}</span>
-                <span className="tabular text-xs text-muted-foreground">
+                <span className="text-sm font-semibold">{scheme.name}</span>
+                <span className="tabular text-sm text-muted-foreground">
                   {scheme.beneficiaries.toLocaleString("en-IN")} of{" "}
                   {scheme.target.toLocaleString("en-IN")}
                 </span>
               </div>
               <div className="mt-2 flex items-center gap-3">
-                <Progress value={pct} className="h-1.5" />
-                <span className="tabular w-9 shrink-0 text-right text-xs font-medium">
+                <Progress value={pct} aria-label={`${scheme.name}: ${pct}% of target`} />
+                <span className="tabular w-11 shrink-0 text-right text-sm font-bold">
                   {pct}%
                 </span>
               </div>

@@ -25,13 +25,13 @@ export function PassportCard() {
   ];
 
   return (
-    <Card className="h-full border-[var(--brand-turmeric)]/45">
+    <Card className="h-full">
       <CardHeader>
         <div className="flex items-center gap-2">
-          <QrCode className="size-4 text-[var(--brand-leaf)]" />
-          <CardTitle className="text-sm font-semibold">Origin Passport</CardTitle>
+          <QrCode className="size-5 text-brick" aria-hidden />
+          <CardTitle>Origin Passport</CardTitle>
         </div>
-        <CardDescription className="text-xs">
+        <CardDescription>
           Signed provenance tied to the beneficiary record
         </CardDescription>
       </CardHeader>
@@ -40,17 +40,17 @@ export function PassportCard() {
         <dl className="space-y-3">
           {rows.map((row) => (
             <div key={row.label} className="flex items-baseline justify-between">
-              <dt className="text-xs text-muted-foreground">{row.label}</dt>
-              <dd className="tabular text-sm font-medium">
+              <dt className="text-sm text-muted-foreground">{row.label}</dt>
+              <dd className="tabular text-base font-bold">
                 {row.value.toLocaleString("en-IN")}
               </dd>
             </div>
           ))}
         </dl>
 
-        <div className="mt-5 flex items-start gap-2 rounded-md bg-secondary p-3">
-          <ShieldCheck className="mt-px size-4 shrink-0 text-[var(--brand-success)]" />
-          <p className="text-xs leading-relaxed text-muted-foreground">
+        <div className="mt-5 flex items-start gap-2 rounded-xl border-2 border-teal/40 bg-secondary p-3">
+          <ShieldCheck className="mt-px size-4 shrink-0 text-[var(--hs-teal)]" />
+          <p className="text-sm leading-relaxed text-muted-foreground">
             <span className="tabular font-medium text-foreground">{rate}%</span>{" "}
             of scans verified against the issuing key. Provenance is verified,
             not claimed.

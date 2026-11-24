@@ -1,36 +1,52 @@
-import type { Metadata } from "next";
-import { JetBrains_Mono, Mukta, Plus_Jakarta_Sans } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { JetBrains_Mono, Lexend, Mukta, Noto_Sans } from "next/font/google";
 import "./globals.css";
 
 import { BRAND } from "@/lib/brand";
 
-/* Plus Jakarta Sans for the interface: friendly, readable, and its figures
-   hold up in dense tables. Mukta carries the Devanagari, so Hindi labels sit
-   at the same weight as the English beside them. */
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+/* Lexend for headings: it was designed to improve reading fluency, which
+   matters for first-time and low-literacy readers. Noto Sans for body text,
+   because the Noto family covers every Indian script we will add next.
+   Mukta carries Devanagari at a matching weight. */
+const display = Lexend({
+  variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
-const jetbrains = JetBrains_Mono({
-  variable: "--font-jetbrains",
+const body = Noto_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const mukta = Mukta({
-  variable: "--font-mukta",
-  subsets: ["devanagari", "latin"],
-  weight: ["400", "600"],
+const deva = Mukta({
+  variable: "--font-deva",
+  subsets: ["devanagari"],
+  weight: ["400", "600", "700"],
+  display: "swap",
+});
+
+const code = JetBrains_Mono({
+  variable: "--font-code",
+  subsets: ["latin"],
+  weight: ["400", "500"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND.name} Programme Console`,
+  title: {
+    default: `${BRAND.name} · ${BRAND.headline}`,
+    template: `%s · ${BRAND.name}`,
+  },
   description: BRAND.description,
+  icons: { icon: "/logo.svg" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1E2A78",
 };
 
 export default function RootLayout({
@@ -41,9 +57,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${jetbrains.variable} ${mukta.variable} h-full antialiased`}
+      className={`${display.variable} ${body.variable} ${deva.variable} ${code.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

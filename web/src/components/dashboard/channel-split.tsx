@@ -20,28 +20,28 @@ export function ChannelSplit() {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-sm font-semibold">Sales by channel</CardTitle>
-        <CardDescription className="text-xs">
+        <CardTitle>Sales by channel</CardTitle>
+        <CardDescription>
           One listing is published to every channel at once
         </CardDescription>
       </CardHeader>
 
       <CardContent>
-        <div className="flex h-2 w-full overflow-hidden rounded-full">
+        <div className="flex h-4 w-full overflow-hidden rounded-full border-2 border-ink">
           {channels.map((c, i) => (
             <div
               key={c.channel}
               style={{ width: `${c.share}%`, background: tones[i] }}
-              title={`${c.channel} ${c.share} percent`}
+              role="presentation"
             />
           ))}
         </div>
 
         <ul className="mt-5 space-y-3">
           {channels.map((c, i) => (
-            <li key={c.channel} className="flex items-center gap-3 text-xs">
+            <li key={c.channel} className="flex items-center gap-3 text-sm">
               <span
-                className="size-2.5 shrink-0 rounded-[3px]"
+                className="size-3.5 shrink-0 rounded-[4px] border border-ink"
                 style={{ background: tones[i] }}
               />
               <span className="flex-1 font-medium">{c.channel}</span>

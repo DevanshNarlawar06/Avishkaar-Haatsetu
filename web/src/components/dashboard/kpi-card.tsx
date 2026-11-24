@@ -9,6 +9,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { Card, CardContent } from "@/components/ui/card";
+import type { Kpi } from "@/lib/data";
+import { cn } from "@/lib/utils";
+
 const icons: Record<string, LucideIcon> = {
   artisans: Users,
   active: UserCheck,
@@ -16,50 +20,36 @@ const icons: Record<string, LucideIcon> = {
   gmv: ShoppingBag,
 };
 
-import { Card, CardContent } from "@/components/ui/card";
-import type { Kpi } from "@/lib/data";
-import { cn } from "@/lib/utils";
+const trendStyle = {
+  up: { icon: ArrowUpRight, tone: "bg-teal text-white", word: "up" },
+  down: { icon: ArrowDownRight, tone: "bg-brick text-white", word: "down" },
+  flat: { icon: Minus, tone: "bg-secondary text-ink", word: "unchanged" },
+} as const;
 
 export function KpiCard({ kpi }: { kpi: Kpi }) {
-  const Icon =
-    kpi.trend === "up"
-      ? ArrowUpRight
-      : kpi.trend === "down"
-        ? ArrowDownRight
-        : Minus;
-
-  const tone =
-    kpi.trend === "up"
-      ? "text-[var(--brand-success)]"
-      : kpi.trend === "down"
-        ? "text-destructive"
-        : "text-muted-foreground";
-
+  const trend = trendStyle[kpi.trend];
   const KpiIcon = icons[kpi.id] ?? Users;
 
   return (
-    <Card className="gap-0 py-5 transition-shadow hover:shadow-md">
-      <CardContent className="px-5">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-medium text-muted-foreground">{kpi.label}</p>
-          <span className="grid size-8 place-items-center rounded-lg bg-accent text-accent-foreground">
-            <KpiIcon className="size-4" />
+    <Card className="gap-0">
+      <CardContent>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-sm font-semibold text-muted-foreground">{kpi.label}</p>
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-ink bg-saffron text-ink">
+            <KpiIcon className="size-5" aria-hidden />
           </span>
         </div>
 
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="tabular text-[28px] font-bold tracking-tight">
-            {kpi.value}
-          </span>
-          <span
-            className={cn("flex items-center gap-0.5 rounded-full bg-secondary px-1.5 py-0.5 text-xs font-semibold", tone)}
-          >
-            <Icon className="size-3.5" />
+        <div className="mt-2 flex flex-wrap items-baseline gap-2">
+          <span className="tabular font-heading text-3xl font-bold tracking-tight">{kpi.value}</span>
+          <span className={cn("flex items-center gap-0.5 rounded-full px-2 py-0.5 text-sm font-bold", trend.tone)}>
+            <trend.icon className="size-4" aria-hidden />
+            <span className="sr-only">{trend.word} </span>
             {kpi.change}%
           </span>
         </div>
 
-        <p className="mt-2 text-xs text-muted-foreground">{kpi.note}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{kpi.note}</p>
       </CardContent>
     </Card>
   );

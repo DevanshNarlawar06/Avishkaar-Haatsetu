@@ -28,10 +28,10 @@ export function ActivityChart() {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-sm font-semibold">
+        <CardTitle>
           Listings and orders
         </CardTitle>
-        <CardDescription className="text-xs">
+        <CardDescription>
           Whether catalogued goods are converting into sales
         </CardDescription>
       </CardHeader>
@@ -45,13 +45,13 @@ export function ActivityChart() {
               tickLine={false}
               axisLine={false}
               tickMargin={10}
-              fontSize={11}
+              fontSize={13}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
               width={38}
-              fontSize={11}
+              fontSize={13}
               tickFormatter={(v: number) => `${(v / 1000).toFixed(1)}k`}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
