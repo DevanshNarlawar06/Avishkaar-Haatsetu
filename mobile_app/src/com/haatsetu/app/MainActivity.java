@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.WindowInsets;
 import android.webkit.JavascriptInterface;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * HaatSetu artisan app: a WebView shell around the bundled app in assets/.
@@ -37,6 +39,7 @@ import java.util.List;
  *  - Live mode calls the HaatSetu API at the address saved in Settings (window.HaatSetuNative.setServer).
  *  - Microphone and camera are granted to the bundled pages only, after Android's own permission prompt.
  *  - "Choose photo" opens the camera or the gallery; photos taken here are saved to the phone's Pictures.
+ *  - Read-aloud uses Android's own TextToSpeech (WebView has no speechSynthesis), so every screen can be heard.
  */
 public class MainActivity extends Activity {
     static final String ASSETS = "file:///android_asset/";
@@ -47,6 +50,8 @@ public class MainActivity extends Activity {
     private PermissionRequest pendingPermission;
     private ValueCallback<Uri[]> fileCallback;
     private Uri cameraUri;
+    private TextToSpeech tts;
+    private volatile boolean ttsReady;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -62,7 +67,8 @@ public class MainActivity extends Activity {
         s.setAllowContentAccess(false);
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        s.setTextZoom(100);
+        // Follow the phone's font size setting (people with weak eyesight raise it), capped so layouts hold.
+        s.setTextZoom(Math.round(Math.max(1f, Math.min(1.3f, getResources().getConfiguration().fontScale)) * 100));
         // The app has its own light palette; stop Android dark mode from repainting it.
         if (Build.VERSION.SDK_INT >= 33) s.setAlgorithmicDarkeningAllowed(false);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -71,7 +77,7 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Bridge(), "HaatSetuNative");
 
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(Color.parseColor("#F6F4EC"));
+        root.setBackgroundColor(Color.parseColor("#FAF3E1"));
         root.addView(web, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         root.setOnApplyWindowInsetsListener((v, insets) -> {
             if (Build.VERSION.SDK_INT >= 30) {
@@ -85,8 +91,10 @@ public class MainActivity extends Activity {
             return insets.consumeSystemWindowInsets();
         });
         setContentView(root);
-        getWindow().setStatusBarColor(Color.parseColor("#133429"));
-        getWindow().setNavigationBarColor(Color.parseColor("#F6F4EC"));
+        getWindow().setStatusBarColor(Color.parseColor("#1E2A78"));
+        getWindow().setNavigationBarColor(Color.parseColor("#FAF3E1"));
+
+        tts = new TextToSpeech(this, status -> ttsReady = status == TextToSpeech.SUCCESS);
 
         if (state == null || web.restoreState(state) == null) web.loadUrl(ASSETS + "index.html");
     }
@@ -248,10 +256,36 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** True once the phone's text-to-speech engine is ready. */
+        @JavascriptInterface
+        public boolean canSpeak() { return ttsReady; }
+
+        /** Reads text aloud. lang is a BCP 47 tag such as "hi-IN" or "en-IN". */
+        @JavascriptInterface
+        public void speak(String text, String lang) {
+            if (!ttsReady || text == null) return;
+            runOnUiThread(() -> {
+                Locale want = Locale.forLanguageTag(lang == null || lang.isEmpty() ? "en-IN" : lang);
+                if (tts.isLanguageAvailable(want) >= TextToSpeech.LANG_AVAILABLE) tts.setLanguage(want);
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "hs-read");
+            });
+        }
+
+        @JavascriptInterface
+        public void stopSpeaking() {
+            runOnUiThread(() -> { if (tts != null) tts.stop(); });
+        }
+
         @JavascriptInterface
         public void toast(String text) {
             runOnUiThread(() -> Toast.makeText(MainActivity.this, text == null ? "" : text, Toast.LENGTH_SHORT).show());
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts != null) tts.shutdown();
+        super.onDestroy();
     }
 
     @Override

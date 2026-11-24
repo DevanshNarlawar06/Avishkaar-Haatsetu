@@ -15,6 +15,8 @@
     gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
     tick: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>',
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+    send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>',
     share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
   };
 
@@ -26,6 +28,28 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage full: keep in memory */ } };
   const t = (k) => (I18N[S.lang] && I18N[S.lang][k]) || I18N.en[k] || k;
   const live = () => S.mode === "live";
+
+  // Read-aloud. Android WebView has no speechSynthesis, so the APK speaks through the native
+  // bridge (TextToSpeech); a desktop browser uses speechSynthesis. No engine, no button.
+  const Voice = {
+    available: () => !!(N && N.speak) || "speechSynthesis" in window,
+    say(text) {
+      const lang = (I18N[S.lang] && I18N[S.lang]._speech) || "en-IN";
+      if (N && N.speak) { N.speak(text, lang); return; }
+      if ("speechSynthesis" in window) {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text); u.lang = lang; speechSynthesis.speak(u);
+      }
+    },
+    stop() {
+      if (N && N.stopSpeaking) N.stopSpeaking();
+      if ("speechSynthesis" in window) speechSynthesis.cancel();
+    },
+  };
+  const listen = (...lines) => Voice.available()
+    ? `<button class="listen" type="button" data-say="${esc(lines.filter(Boolean).join(". "))}">${ICON.sound}<span>${t("listen")}</span></button>`
+    : "";
+  const langs = () => Object.keys(I18N).map((code) => ({ code, name: I18N[code]._name || code }));
 
   let draft = null;
   let history = [];
@@ -39,6 +63,8 @@
   function show(id, push = true) {
     const cur = document.querySelector(".view.on");
     if (push && cur && cur.id !== id) history.push(cur.id);
+    Voice.stop();
+    document.documentElement.lang = S.lang;
     document.querySelectorAll(".view").forEach((v) => v.classList.toggle("on", v.id === id));
     (RENDER[id] || (() => {}))();
     window.scrollTo(0, 0);
@@ -58,41 +84,50 @@
   const bar = (title, extra = "") =>
     `<div class="bar"><button class="icon-btn" data-back aria-label="${t("back")}">${ICON.back}</button><h1>${esc(title)}</h1>${extra}</div>`;
   const modeBadge = () => live() ? `<span class="badge live dot">${t("live")}</span>` : `<span class="badge demo dot">${t("demo")}</span>`;
-  const steps = (n) =>
-    `<div class="steps">${[1, 2, 3, 4].map((i) => `<div class="${i < n ? "done" : i === n ? "now" : ""}"></div>`).join("")}</div>
-     <div class="step-label">${t("step")} ${n} ${S.lang === "hi" ? t("of") + " 4" : t("of") + " 4"} · ${t("s" + n)}</div>`;
+  // Each step is an icon AND a word, so the stepper can be followed without reading numbers.
+  const STEP_ICONS = [ICON.mic, ICON.cam, ICON.rupee, ICON.send];
+  const stepOf = (n) => t("stepOf").replace("{n}", n).replace("{total}", 4);
+  const stepHead = (n) => {
+    const title = t("s" + n + "t"), sub = t("s" + n + "s");
+    return `<ol class="stepper" aria-label="${esc(stepOf(n))}">
+        ${[1, 2, 3, 4].map((i) => `<li class="${i < n ? "done" : i === n ? "now" : ""}"${i === n ? ' aria-current="step"' : ""}><i>${i < n ? ICON.tick : STEP_ICONS[i - 1]}</i>${t("s" + i)}</li>`).join("")}
+      </ol>
+      <div class="step-head"><div>
+        <p class="step-label">${esc(stepOf(n))}</p>
+        <h2 class="step-title">${title}</h2><p class="step-sub">${sub}</p>
+      </div>${listen(title, sub)}</div>`;
+  };
 
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-back]")) window.hsBack();
+    const say = e.target.closest("[data-say]");
+    if (say) Voice.say(say.dataset.say);
   });
 
   // ---------------------------------------------------------------- views
   const RENDER = {};
 
   RENDER.welcome = function () {
+    const points = [[ICON.mic, t("p1")], [ICON.cam, t("p2")], [ICON.rupee, t("p3")], [ICON.shield, t("p4")]];
     $("#welcome").innerHTML = `
       <div>
-        <div class="row between">
-          <span class="badge hero-badge">AVISHKAAR · Theme 1</span>
-          <div class="lang-switch"><button data-lang="hi" class="${S.lang === "hi" ? "on" : ""}">हिंदी</button><button data-lang="en" class="${S.lang === "en" ? "on" : ""}">English</button></div>
+        <div class="welcome-head">
+          <div class="brand"><img src="logo.svg" alt=""><b>HaatSetu</b></div>
+          ${listen(t("line1"), t("line2"), t("line3"), ...points.map((p) => p[1]))}
         </div>
-        <img class="welcome-mark" src="logo.svg" alt="">
-        <h1 class="welcome-title">Haat<span>Setu</span></h1>
-        <p class="welcome-tag">${S.lang === "hi" ? "गाँव के हाट से हर बाज़ार तक" : "From the village haat to every market"}</p>
-        <p class="small" style="color:rgba(255,255,255,.7);margin:6px 0 0">${t("forWho")}</p>
-        <ul class="welcome-points">
-          <li><i>${ICON.mic}</i>${t("p1")}</li>
-          <li><i>${ICON.cam}</i>${t("p2")}</li>
-          <li><i>${ICON.rupee}</i>${t("p3")}</li>
-          <li><i>${ICON.shield}</i>${t("p4")}</li>
-        </ul>
+        <h1 class="welcome-lines"><span>${t("line1")}</span><span>${t("line2")}</span><span>${t("line3")}</span></h1>
+        <p class="welcome-tag">${t("forWho")}</p>
+        <ul class="welcome-points">${points.map(([icon, text]) => `<li><i>${icon}</i>${text}</li>`).join("")}</ul>
+        <div class="lang-switch" role="group" aria-label="${t("language")}">
+          ${langs().map((l) => `<button type="button" data-lang="${l.code}" lang="${l.code}" class="${S.lang === l.code ? "on" : ""}" aria-pressed="${S.lang === l.code}">${esc(l.name)}</button>`).join("")}
+        </div>
       </div>
       <div class="stack" style="margin-top:28px">
-        <button class="btn accent big" id="go-demo">${t("tryDemo")}</button>
+        <button class="btn accent big" id="go-demo">${ICON.mic} ${t("tryDemo")}</button>
         <button class="btn ghost" id="go-live">${t("signIn")}</button>
-        <p class="small" style="text-align:center;color:rgba(255,255,255,.6);margin:6px 0 0">${t("demoNote")}</p>
+        <p class="welcome-note">${t("demoNote")}</p>
       </div>`;
-    $("#welcome").querySelectorAll("[data-lang]").forEach((b) => b.onclick = () => { S.lang = b.dataset.lang; save(); RENDER.welcome(); });
+    $("#welcome").querySelectorAll("[data-lang]").forEach((b) => b.onclick = () => { S.lang = b.dataset.lang; save(); show("welcome", false); });
     $("#go-demo").onclick = () => { S.mode = "demo"; S.user = null; save(); history = []; show("home", false); };
     $("#go-live").onclick = () => show("login");
   };
@@ -151,9 +186,8 @@
           ${modeBadge()}
           <button class="icon-btn" id="home-gear" aria-label="${t("settings")}">${ICON.gear}</button>
         </div>
-        <div class="hello">${t("namaste")}, ${esc(name)} 🙏</div>
+        <div class="hello">${t("namaste")}, ${esc(name)}</div>
         <div class="sub">${esc(place)}</div>
-        <div style="height:16px"></div>
       </div>
       <div class="stats">
         <div class="stat"><b>${mine.length}</b><span>${t("listed")}</span></div>
@@ -170,7 +204,8 @@
     const list = $("#plist");
     if (!mine.length) { list.innerHTML = `<div class="card empty">${t("noProducts")}</div>`; return; }
     mine.sort((x, y) => y.created - x.created).forEach((p) => {
-      const el = document.createElement("div");
+      const el = document.createElement("button");
+      el.type = "button";
       el.className = "card product";
       const img = p.thumb || DEMO.cleanPhoto(p.kind);
       const title = S.lang === "hi" ? p.listing.title_hi : p.listing.title_en;
@@ -202,8 +237,7 @@
 
   RENDER.speak = function () {
     const d = draft;
-    $("#speak").innerHTML = `${bar(t("newProduct"), modeBadge())}${steps(1)}
-      <h2 class="step-title">${t("s1t")}</h2><p class="step-sub">${t("s1s")}</p>
+    $("#speak").innerHTML = `${bar(t("newProduct"), modeBadge())}${stepHead(1)}
       <div class="pad stack" id="speak-body"></div>
       <div class="foot"><button class="btn primary" id="speak-next" ${d.listing ? "" : "disabled"}>${t("next")}</button></div>`;
     $("#speak-next").onclick = () => show("photo");
@@ -213,6 +247,7 @@
       <div class="mic-wrap">
         <button class="mic" id="mic" aria-label="${t("tapToSpeak")}">${ICON.mic}</button>
         <div class="mic-time" id="mic-time">${t("tapToSpeak")}</div>
+        <p class="muted small" style="text-align:center;margin:6px 0 0">${t("howHeard")}</p>
         <div class="levels" id="levels">${"<i></i>".repeat(16)}</div>
       </div>
       <button class="btn link" id="use-sample">${t("sample")}</button>
@@ -223,7 +258,7 @@
 
   async function startRecording() {
     const err = $("#speak-err");
-    if (!Recorder.supported()) { err.textContent = "Microphone not available here. Use the sample voice note."; return; }
+    if (!Recorder.supported()) { err.textContent = t("micMissing"); return; }
     try {
       const bars = [...document.querySelectorAll("#levels i")];
       let k = 0;
@@ -237,7 +272,7 @@
       }, 250);
     } catch (e) {
       rec = null;
-      err.textContent = "Microphone permission was not given. You can use the sample voice note.";
+      err.textContent = t("micDenied");
     }
   }
 
@@ -298,15 +333,14 @@
 
   // ---------------------------------------------------------------- step 2: photo
   RENDER.photo = function () {
-    $("#photo").innerHTML = `${bar(t("newProduct"), modeBadge())}${steps(2)}
-      <h2 class="step-title">${t("s2t")}</h2><p class="step-sub">${t("s2s")}</p>
+    $("#photo").innerHTML = `${bar(t("newProduct"), modeBadge())}${stepHead(2)}
       <div class="pad stack" id="photo-body"></div>
       <div class="foot"><button class="btn primary" id="photo-next" ${draft.studio ? "" : "disabled"}>${t("next")}</button></div>`;
     $("#photo-next").onclick = () => show("price");
     if (draft.studio) return renderCompare();
     $("#photo-body").innerHTML = `
-      <div class="photo-pick">${ICON.cam}<p class="muted" style="margin:8px 0 14px">${t("s2s")}</p>
-        <button class="btn primary" id="pick">${t("takePhoto")}</button></div>
+      <div class="photo-pick">${ICON.cam}<p class="muted" style="margin:10px 0 16px">${t("s2s")}</p>
+        <button class="btn primary" id="pick">${ICON.cam} ${t("takePhoto")}</button></div>
       <button class="btn link" id="sample-photo">${t("samplePhoto")}</button>
       <div class="error" id="photo-err"></div>`;
     $("#pick").onclick = () => { const f = $("#file"); f.value = ""; f.click(); };
@@ -399,8 +433,7 @@
 
   // ---------------------------------------------------------------- step 3: price
   RENDER.price = function () {
-    $("#price").innerHTML = `${bar(t("newProduct"), modeBadge())}${steps(3)}
-      <h2 class="step-title">${t("s3t")}</h2><p class="step-sub">${t("s3s")}</p>
+    $("#price").innerHTML = `${bar(t("newProduct"), modeBadge())}${stepHead(3)}
       <div class="pad stack">
         <div class="card stack">
           <label class="field"><span>${t("hours")}</span>
@@ -471,7 +504,7 @@
         <span class="lbl" style="left:${pos(p.p10)}%">P10 ${rupee(p.p10)}</span>
         <span class="lbl" style="left:${pos(p.p90)}%">P90 ${rupee(p.p90)}</span>
       </div>
-      <div class="small" style="color:var(--chili);font-weight:700">▍${t("floor")} ${rupee(p.floor)}</div>
+      <div class="floor-key">${t("floor")} ${rupee(p.floor)}</div>
       <div class="small muted" style="margin-top:6px">${t("yourPrice")}</div>
       <div class="price-big" id="price-val">${rupee(draft.price)}</div>
       <input type="range" class="slider" id="price-slider" min="${Math.round(p.floor * 0.7 / 10) * 10}" max="${Math.round(max / 10) * 10}" step="10" value="${draft.price}">
@@ -490,17 +523,16 @@
   let reviewLang = "en";
   RENDER.review = function () {
     const l = draft.listing;
-    const chs = [["store", t("chStore"), "#1D4B39", "HS"], ["ondc", t("chOndc"), "#4253A6", "ON"], ["wa", t("chWa"), "#2F8552", "WA"], ["b2b", t("chB2b"), "#E08A1E", "B2B"]];
-    $("#review").innerHTML = `${bar(t("newProduct"), modeBadge())}${steps(4)}
-      <h2 class="step-title">${t("s4t")}</h2><p class="step-sub">${t("s4s")}</p>
+    const chs = [["store", t("chStore"), "#1E2A78", "#fff", "HS"], ["ondc", t("chOndc"), "#DCE0FF", "#15163F", "ON"], ["wa", t("chWa"), "#2F7A6B", "#fff", "WA"], ["b2b", t("chB2b"), "#F4A81E", "#15163F", "B2B"]];
+    $("#review").innerHTML = `${bar(t("newProduct"), modeBadge())}${stepHead(4)}
       <div class="pad stack">
         <div class="card product"><img src="${esc(draft.studio)}" alt=""><div class="grow"><div class="price">${rupee(draft.price)}</div><div class="small muted">${t("floor")} ${rupee(draft.pricing.floor)}</div></div></div>
         <div class="tabs"><button data-rl="en" class="${reviewLang === "en" ? "on" : ""}">English</button><button data-rl="hi" class="${reviewLang === "hi" ? "on" : ""}">हिंदी</button></div>
         <label class="field"><span>${t("title")}</span><input class="input" id="r-title" value="${esc(l["title_" + reviewLang])}"></label>
         <label class="field"><span>${t("desc")}</span><textarea class="input" id="r-desc">${esc(l["description_" + reviewLang])}</textarea></label>
         <div class="card"><h3 style="margin-bottom:4px">${t("channels")}</h3>
-          ${chs.map(([k, name, col, ab]) => `<div class="channel"><i style="background:${col}">${ab}</i><div class="grow">${name}</div>
-            <label class="switch"><input type="checkbox" data-ch="${k}" ${draft.channels.includes(k) ? "checked" : ""}><span></span></label></div>`).join("")}
+          ${chs.map(([k, name, bg, fg, ab]) => `<label class="channel"><i style="background:${bg};color:${fg}" aria-hidden="true">${ab}</i><span class="grow">${name}</span>
+            <span class="switch"><input type="checkbox" data-ch="${k}" ${draft.channels.includes(k) ? "checked" : ""}><span></span></span></label>`).join("")}
         </div>
         <div class="error" id="pub-err"></div>
       </div>
@@ -517,7 +549,7 @@
 
   async function publish() {
     const btn = $("#publish");
-    btn.disabled = true; btn.innerHTML = `<span class="spinner" style="width:20px;height:20px;border-width:3px;margin:0"></span> ${t("publishing")}`;
+    btn.disabled = true; btn.innerHTML = `<span class="spinner" style="width:22px;height:22px;border-width:3px;margin:0"></span> ${t("publishing")}`;
     const l = draft.listing;
     let passport = null;
     if (live()) {
@@ -591,13 +623,13 @@
     try { const q = qrcode(0, "M"); q.addData(pp.qr); q.make(); qrSvg = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); } catch (e) { qrSvg = ""; }
     const maker = live() && S.user ? (S.user.name || "Artisan") : (S.lang === "hi" ? a.nameHi : a.name);
     const region = live() ? "—" : (S.lang === "hi" ? a.placeHi : a.place);
-    $("#passport").innerHTML = `${bar(t("passport"))}
+    $("#passport").innerHTML = `${bar(t("passport"), listen(d.justPublished ? t("published") + ". " + t("publishedSub") : "", t("passportSub")))}
       <div class="pad stack">
-        ${d.justPublished ? `<div class="success-head"><div class="tick">${ICON.tick}</div><h2 style="font-size:22px;margin:0">${t("published")}</h2><p class="muted" style="margin:4px 0 0">${t("publishedSub")}</p></div>` : ""}
+        ${d.justPublished ? `<div class="success-head"><div class="tick">${ICON.tick}</div><h2 style="font-size:26px;margin:0">${t("published")}</h2><p class="muted" style="margin:4px 0 0">${t("publishedSub")}</p></div>` : ""}
         <div class="passport">
           <div class="row between"><b style="font-size:17px">${t("passport")}</b>
             <span class="seal ${pp.signed ? "signed" : ""}">${ICON.shield.replace("<svg", '<svg width="14" height="14"')} ${pp.signed ? t("signedLive") : t("signedDemo")}</span></div>
-          <div class="small" style="color:rgba(255,255,255,.75);margin-top:4px">${t("passportSub")}</div>
+          <div class="small" style="color:rgba(255,250,240,.85);margin-top:4px">${t("passportSub")}</div>
           <div class="qr">${qrSvg}</div>
           <dl>
             <dt>${t("maker")}</dt><dd>${esc(maker)}</dd>
@@ -619,7 +651,7 @@
       const text = `${l.title_en}\n${l.title_hi}\n\n${l.description_en}\n\n${rupee(d.price)} · HaatSetu\n${t("passport")}: ${pp.id}`;
       if (N) N.share(text);
       else if (navigator.share) navigator.share({ text }).catch(() => {});
-      else { navigator.clipboard && navigator.clipboard.writeText(text); toast("Copied"); }
+      else { navigator.clipboard && navigator.clipboard.writeText(text); toast(t("copied")); }
     };
     $("#go-home").onclick = () => { draft = null; history = []; show("home", false); };
   };
@@ -636,12 +668,12 @@
         </div>
         <div class="card stack">
           <div class="row between"><b>${t("language")}</b>
-            <div class="tabs" style="width:180px"><button data-l="hi" class="${S.lang === "hi" ? "on" : ""}">हिंदी</button><button data-l="en" class="${S.lang === "en" ? "on" : ""}">English</button></div></div>
+            <div class="tabs" style="min-width:200px" role="group" aria-label="${t("language")}">${langs().map((l) => `<button type="button" data-l="${l.code}" lang="${l.code}" class="${S.lang === l.code ? "on" : ""}" aria-pressed="${S.lang === l.code}">${esc(l.name)}</button>`).join("")}</div></div>
           <div class="row between"><b>${t("mode")}</b>${modeBadge()}</div>
         </div>
         <button class="btn ghost" id="reset">${t("reset")}</button>
-        <button class="btn ghost" id="signout" style="color:var(--chili)">${t("signOut")}</button>
-        <p class="small muted" style="text-align:center">HaatSetu 1.3 · AVISHKAAR Season 4</p>
+        <button class="btn danger" id="signout">${t("signOut")}</button>
+        <p class="small muted" style="text-align:center">HaatSetu 1.4</p>
       </div>`;
     const msg = (cls, m) => { $("#srv-msg").innerHTML = m ? `<div class="note ${cls} small">${esc(m)}</div>` : ""; };
     $("#srv-save").onclick = () => {
@@ -657,7 +689,7 @@
         msg("ok", "OK · " + Object.entries(h || {}).map(([k, v]) => k + ": " + (typeof v === "object" ? JSON.stringify(v) : v)).join(" · "));
       } catch (e) { msg("bad", t("failed") + ": " + e.message); }
     };
-    document.querySelectorAll("[data-l]").forEach((b) => b.onclick = () => { S.lang = b.dataset.l; save(); RENDER.settings(); });
+    document.querySelectorAll("[data-l]").forEach((b) => b.onclick = () => { S.lang = b.dataset.l; save(); document.documentElement.lang = S.lang; RENDER.settings(); });
     $("#reset").onclick = () => { S.products = DEMO.seedProducts().concat(S.products.filter((p) => p.live)); save(); toast(t("saved")); };
     $("#signout").onclick = () => { Api.setToken(""); S.user = null; S.mode = "demo"; save(); history = []; show("welcome", false); };
   };

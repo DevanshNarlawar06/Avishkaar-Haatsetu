@@ -1,4 +1,6 @@
-// UI text in English and Hindi. The listing itself comes back in both languages from the model.
+// UI text, one dictionary per language. The listing itself comes back in both languages from the model.
+// To add a language: copy the `en` block, translate it, set _name (shown in the picker) and _speech
+// (the read-aloud voice, a BCP 47 tag such as "ta-IN"). Missing keys fall back to English.
 window.I18N = {
   en: {
     tagline: "From the village haat to every market",
@@ -86,6 +88,16 @@ window.I18N = {
     days: "days",
     sold: "sold",
     modelShot: "Model shot",
+    // Added with the deck redesign.
+    _name: "English", _speech: "en-IN",
+    line1: "Your craft.", line2: "Your voice.", line3: "Your price.",
+    listen: "Listen", stopListen: "Stop",
+    micMissing: "This phone has no microphone here. Use the sample voice note.",
+    micDenied: "Microphone permission was not given. You can use the sample voice note.",
+    copied: "Copied",
+    stepOf: "Step {n} of {total}",
+    howHeard: "Press the big button and talk. Press again when you finish.",
+    belowFloorShort: "Too low",
   },
   hi: {
     tagline: "गाँव के हाट से हर बाज़ार तक",
@@ -173,5 +185,14 @@ window.I18N = {
     days: "दिन",
     sold: "बिके",
     modelShot: "मॉडल फ़ोटो",
+    _name: "हिंदी", _speech: "hi-IN",
+    line1: "आपका हुनर।", line2: "आपकी आवाज़।", line3: "आपका दाम।",
+    listen: "सुनें", stopListen: "रोकें",
+    micMissing: "इस फ़ोन में यहाँ माइक नहीं मिला। नमूना वॉइस नोट इस्तेमाल करें।",
+    micDenied: "माइक की अनुमति नहीं मिली। आप नमूना वॉइस नोट इस्तेमाल कर सकते हैं।",
+    copied: "कॉपी हो गया",
+    stepOf: "कदम {n} / {total}",
+    howHeard: "बड़ा बटन दबाएँ और बोलें। बोलकर फिर से दबाएँ।",
+    belowFloorShort: "बहुत कम",
   },
 };
